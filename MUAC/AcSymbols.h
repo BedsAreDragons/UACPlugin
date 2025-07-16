@@ -50,7 +50,7 @@ public:
 		CPen SymbolPen(PS_SOLID, 1, SymbolColor);
 
 		dc->SelectObject(&TrailPen);
-		CBrush *oldBrush = (CBrush *)dc->SelectStockObject(NULL_BRUSH);
+		CBrush* oldBrush = (CBrush*)dc->SelectStockObject(NULL_BRUSH);
 
 		// History Trail
 		CRadarTargetPositionData TrailPosition = radarTarget.GetPreviousPosition(radarTarget.GetPreviousPosition(radarTarget.GetPosition()));
@@ -60,12 +60,18 @@ public:
 
 			POINT historyTrailPoint = radar->ConvertCoordFromPositionToPixel(TrailPosition.GetPosition());
 
-			CRect Area(historyTrailPoint.x - DRAWING_AC_SQUARE_TRAIL_SIZE, historyTrailPoint.y - DRAWING_AC_SQUARE_TRAIL_SIZE,
-				historyTrailPoint.x + DRAWING_AC_SQUARE_TRAIL_SIZE,  historyTrailPoint.y + DRAWING_AC_SQUARE_TRAIL_SIZE);
+			CRect Area(
+				historyTrailPoint.x - DRAWING_AC_SQUARE_TRAIL_SIZE,
+				historyTrailPoint.y - DRAWING_AC_SQUARE_TRAIL_SIZE,
+				historyTrailPoint.x + DRAWING_AC_SQUARE_TRAIL_SIZE,
+				historyTrailPoint.y + DRAWING_AC_SQUARE_TRAIL_SIZE
+			);
 			Area.NormalizeRect();
-			dc->Rectangle(Area);
 
-			// We skip one position for the other
+			// Draw circle instead of square
+			dc->Ellipse(Area);
+
+			// Skip one position for the other
 			TrailPosition = radarTarget.GetPreviousPosition(radarTarget.GetPreviousPosition(TrailPosition));
 		}
 			
@@ -78,23 +84,33 @@ public:
 
 		// Bigger target if ident
 		if (isDetailed || radarTarget.GetPosition().GetTransponderI())
-			Size += (int)(Size*0.25);
+			Size += static_cast<int>(Size * 0.25);
 
-		CRect Area(radarTargetPoint.x - Size, radarTargetPoint.y - Size,
-			radarTargetPoint.x + Size, radarTargetPoint.y + Size);
+		CRect Area(
+			radarTargetPoint.x - Size,
+			radarTargetPoint.y - Size,
+			radarTargetPoint.x + Size,
+			radarTargetPoint.y + Size
+		);
 		Area.NormalizeRect();
 
 		// if STCA or Ident, filled in target
 		if (isStca || radarTarget.GetPosition().GetTransponderI()) {
 			CBrush brush(SymbolColor);
-			dc->FillRect(Area, &brush);
+			CBrush* pOldBrush = dc->SelectObject(&brush);
+
+			// Draw filled circle
+			dc->Ellipse(Area);
+
+			dc->SelectObject(pOldBrush);
 		}
 		else {
-			dc->Rectangle(Area);
+			// Draw outline circle
+			dc->Ellipse(Area);
 		}
 		
-		// Pixel in center
-		//dc->SetPixel(Area.CenterPoint(), SymbolColor);
+		// Pixel in center (optional)
+		// dc->SetPixel(Area.CenterPoint(), SymbolColor);
 
 		dc->RestoreDC(save);
 
@@ -113,8 +129,6 @@ public:
 		dc->SelectObject(&TrailPen);
 		dc->SelectStockObject(NULL_BRUSH);
 
-		
-
 		// History Trail
 		CRadarTargetPositionData TrailPosition = radarTarget.GetPreviousPosition(radarTarget.GetPreviousPosition(radarTarget.GetPosition()));
 		for (int i = 0; i < 5; i++) {
@@ -123,12 +137,16 @@ public:
 
 			POINT historyTrailPoint = radar->ConvertCoordFromPositionToPixel(TrailPosition.GetPosition());
 
-			CRect Area(historyTrailPoint.x - DRAWING_AC_SQUARE_TRAIL_SIZE, historyTrailPoint.y - DRAWING_AC_SQUARE_TRAIL_SIZE,
-				historyTrailPoint.x + DRAWING_AC_SQUARE_TRAIL_SIZE, historyTrailPoint.y + DRAWING_AC_SQUARE_TRAIL_SIZE);
+			CRect Area(
+				historyTrailPoint.x - DRAWING_AC_SQUARE_TRAIL_SIZE,
+				historyTrailPoint.y - DRAWING_AC_SQUARE_TRAIL_SIZE,
+				historyTrailPoint.x + DRAWING_AC_SQUARE_TRAIL_SIZE,
+				historyTrailPoint.y + DRAWING_AC_SQUARE_TRAIL_SIZE
+			);
 			Area.NormalizeRect();
 			dc->Rectangle(Area);
 
-			// We skip one position for the other
+			// Skip one position for the other
 			TrailPosition = radarTarget.GetPreviousPosition(radarTarget.GetPreviousPosition(TrailPosition));
 		}
 
@@ -146,7 +164,12 @@ public:
 		dc->LineTo(radarTargetPoint.x, radarTargetPoint.y - DiamondSize);
 
 		dc->RestoreDC(save);
-		return CRect(radarTargetPoint.x - DiamondSize, radarTargetPoint.y - DiamondSize, radarTargetPoint.x + DiamondSize, radarTargetPoint.y + DiamondSize);
+		return CRect(
+			radarTargetPoint.x - DiamondSize,
+			radarTargetPoint.y - DiamondSize,
+			radarTargetPoint.x + DiamondSize,
+			radarTargetPoint.y + DiamondSize
+		);
 	}
 
 	static void DrawSpeedVector(CDC* dc, TagConfiguration::TagStates State, CRadarScreen* radar, CRadarTarget radarTarget, bool isPrimary, bool isSoft, int Seconds) {
@@ -157,7 +180,9 @@ public:
 		if (!isSoft)
 			VectorColor = Colours::AircraftLightGrey.ToCOLORREF();
 
-		if (State == TagConfiguration::TagStates::Assumed || State == TagConfiguration::TagStates::Next || State == TagConfiguration::TagStates::TransferredToMe)
+		if (State == TagConfiguration::TagStates::Assumed ||
+			State == TagConfiguration::TagStates::Next ||
+			State == TagConfiguration::TagStates::TransferredToMe)
 			VectorColor = Colours::AircraftGreen.ToCOLORREF();
 
 		CPen GreenPen(PS_SOLID, 1, VectorColor);
@@ -165,7 +190,7 @@ public:
 
 		POINT AcPoint = radar->ConvertCoordFromPositionToPixel(radarTarget.GetPosition().GetPosition());
 
-		double d = double(radarTarget.GetPosition().GetReportedGS()*0.514444) * (Seconds);
+		double d = double(radarTarget.GetPosition().GetReportedGS() * 0.514444) * Seconds;
 		CPosition PredictedEnd = Extrapolate(radarTarget.GetPosition().GetPosition(), radarTarget.GetTrackHeading(), d);
 		POINT PredictedEndPoint = radar->ConvertCoordFromPositionToPixel(PredictedEnd);
 
@@ -174,8 +199,12 @@ public:
 		if (isPrimary)
 			bound = DRAWING_AC_PRIMARY_DIAMOND_SIZE + DRAWING_PADDING;
 
-		CRect Area(AcPoint.x - bound, AcPoint.y - bound,
-			AcPoint.x + bound, AcPoint.y + bound);
+		CRect Area(
+			AcPoint.x - bound,
+			AcPoint.y - bound,
+			AcPoint.x + bound,
+			AcPoint.y + bound
+		);
 
 		POINT ClipFrom, ClipTo;
 		if (LiangBarsky(Area, AcPoint, PredictedEndPoint, ClipFrom, ClipTo)) {
@@ -189,32 +218,7 @@ public:
 	static CRect DrawApproachVector(CDC* dc, CRadarScreen* radar, CRadarTarget radarTarget, double distance = 3) {
 		int save = dc->SaveDC();
 
-		double reverseHeading = (int)(radarTarget.GetTrackHeading() + 180) % 360;
+		double reverseHeading = static_cast<int>(radarTarget.GetTrackHeading() + 180) % 360;
 		CPosition middlePointArrow = Extrapolate(radarTarget.GetPosition().GetPosition(), reverseHeading, distance * 1852);
 
-		double topArrowHeading = (int)(reverseHeading - 40) % 360;
-		CPosition topPointArrow = Extrapolate(middlePointArrow, topArrowHeading, 0.6 * 1852);
-		double bottomArrowHeading = (int)(reverseHeading + 40) % 360;
-		CPosition bottomPointArrow = Extrapolate(middlePointArrow, bottomArrowHeading, 0.6 * 1852);
-		
-		CPen ArrowPen(PS_SOLID, 1, Colours::PurpleDisplay.ToCOLORREF());
-		dc->SelectObject(&ArrowPen);
-
-		POINT middleArrowPointPx = radar->ConvertCoordFromPositionToPixel(middlePointArrow);
-
-		POINT topArrowPointPx = radar->ConvertCoordFromPositionToPixel(topPointArrow);
-		dc->MoveTo(middleArrowPointPx);
-		dc->LineTo(topArrowPointPx);
-
-		POINT bottomArrowPointPx = radar->ConvertCoordFromPositionToPixel(bottomPointArrow);
-		dc->MoveTo(middleArrowPointPx);
-		dc->LineTo(bottomArrowPointPx);
-
-		dc->RestoreDC(save);
-
-		CRect r(topArrowPointPx.x, topArrowPointPx.y, middleArrowPointPx.x, bottomArrowPointPx.y);
-		r.NormalizeRect();
-		return r;
-
-	};
-};
+		double topArrowHeading = static_cast<int>(reverse_
