@@ -221,4 +221,29 @@ public:
 		double reverseHeading = static_cast<int>(radarTarget.GetTrackHeading() + 180) % 360;
 		CPosition middlePointArrow = Extrapolate(radarTarget.GetPosition().GetPosition(), reverseHeading, distance * 1852);
 
-		double topArrowHeading = static_cast<int>(reverse_
+		double topArrowHeading = static_cast<int>(reverseHeading - 40) % 360;
+		CPosition topPointArrow = Extrapolate(middlePointArrow, topArrowHeading, 0.6 * 1852);
+
+		double bottomArrowHeading = static_cast<int>(reverseHeading + 40) % 360;
+		CPosition bottomPointArrow = Extrapolate(middlePointArrow, bottomArrowHeading, 0.6 * 1852);
+		
+		CPen ArrowPen(PS_SOLID, 1, Colours::PurpleDisplay.ToCOLORREF());
+		dc->SelectObject(&ArrowPen);
+
+		POINT middleArrowPointPx = radar->ConvertCoordFromPositionToPixel(middlePointArrow);
+		POINT topArrowPointPx = radar->ConvertCoordFromPositionToPixel(topPointArrow);
+		POINT bottomArrowPointPx = radar->ConvertCoordFromPositionToPixel(bottomPointArrow);
+
+		dc->MoveTo(middleArrowPointPx);
+		dc->LineTo(topArrowPointPx);
+
+		dc->MoveTo(middleArrowPointPx);
+		dc->LineTo(bottomArrowPointPx);
+
+		dc->RestoreDC(save);
+
+		CRect r(topArrowPointPx.x, topArrowPointPx.y, middleArrowPointPx.x, bottomArrowPointPx.y);
+		r.NormalizeRect();
+		return r;
+	};
+};
