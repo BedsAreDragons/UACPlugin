@@ -488,7 +488,7 @@ void RadarScreen::OnRefresh(HDC hDC, int Phase)
 			if (!IsPrimary && isCorrelated && ButtonsPressed[BUTTON_FIN]) {
 				if (CorrelatedFlightPlan.GetControllerAssignedData().GetClearedAltitude() == 1) {
 					bool existsInList = find(ExtendedAppVector.begin(), ExtendedAppVector.end(), string(radarTarget.GetCallsign())) != ExtendedAppVector.end();
-					CRect r = AcSymbols::DrawApproachVector(&dc, this, radarTarget, existsInList ? 5 : 3);
+					CRect r = AcSymbols::DrawApproachVector(&dc, this, radarTarget, existsInList ? 5 : 5);
 					AddScreenObject(SCREEN_AC_APP_ARROW, radarTarget.GetCallsign(), r, true, "");
 				}
 			}
