@@ -939,6 +939,7 @@ void RadarScreen::OnClickScreenObject(int ObjectType, const char * sObjectId, PO
 			if (Button == BUTTON_LEFT)
 				RouteBeingShown.push_back(sObjectId);
 				FunctionId = TAG_ITEM_FUNCTION_NEXT_ROUTE_POINTS_POPUP;
+				RouteBeingShown.erase(find(RouteBeingShown.begin(), RouteBeingShown.end(), sObjectId));
 			if (Button == BUTTON_RIGHT)
 				FunctionId = TAG_ITEM_FUNCTION_ASSIGNED_HEADING_POPUP;
 		}
