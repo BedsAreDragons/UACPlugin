@@ -937,6 +937,7 @@ void RadarScreen::OnClickScreenObject(int ObjectType, const char * sObjectId, PO
 			
 		if (ObjectType == SCREEN_TAG_HORIZ) {
 			if (Button == BUTTON_LEFT)
+				RouteBeingShown.begin()
 				FunctionId = TAG_ITEM_FUNCTION_NEXT_ROUTE_POINTS_POPUP;
 			if (Button == BUTTON_RIGHT)
 				FunctionId = TAG_ITEM_FUNCTION_ASSIGNED_HEADING_POPUP;
