@@ -50,34 +50,29 @@ void RadarScreen::LoadFilterButtonsData()
 
 void RadarScreen::OnRefresh(HDC hDC, int Phase)
 {
-	// Only draw during specific refresh phases
 	if (Phase != REFRESH_PHASE_AFTER_TAGS && Phase != REFRESH_PHASE_BEFORE_TAGS)
 		return;
-
-	// Update mouse pointer position relative to radar window
-	POINT cursorPos;
-	if (GetCursorPos(&cursorPos) && ScreenToClient(GetActiveWindow(), &cursorPos)) {
-		MousePoint = cursorPos;
+	
+	// Mouse Pointer
+	POINT p;
+	if (GetCursorPos(&p)) {
+		if (ScreenToClient(GetActiveWindow(), &p)) {
+			MousePoint = p;
+		}
 	}
 
-	// Attach device context
+	// Setup gdi renderer
 	CDC dc;
 	dc.Attach(hDC);
 
-	// Setup GDI+ for advanced graphics
+	// Creating the gdi+ graphics
 	Graphics graphics(hDC);
 	graphics.SetPageUnit(UnitPixel);
 	graphics.SetSmoothingMode(SmoothingModeAntiAlias);
 
-	// Define drawing boundaries
-	CRect radarArea = GetRadarArea();
-	radarArea.top -= 1;
-	radarArea.bottom = GetChatArea().bottom;
-
-	// Draw vertical menu bar
-	CSize radarSize = GetRadarDisplaySize();
-	POINT menuTopRight = { radarSize.cx - 5, 5 };
-	MenuBar::DrawMenuBar(&dc, this, menuTopRight, MousePoint, MenuButtons, ButtonsPressed);
+	CRect RadarArea(GetRadarArea());
+	RadarArea.top = RadarArea.top - 1;
+	RadarArea.bottom = GetChatArea().bottom;
 
 	if (Phase == REFRESH_PHASE_BEFORE_TAGS) {
 
