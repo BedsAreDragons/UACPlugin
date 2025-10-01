@@ -419,7 +419,7 @@ void RadarScreen::OnRefresh(HDC hDC, int Phase)
 			
 		bool isDetailed = DetailedTag == radarTarget.GetCallsign();
 		
-		HideTarget = true;
+		
 
 		// Determining the tag state
 		if (isCorrelated) {
@@ -471,6 +471,9 @@ void RadarScreen::OnRefresh(HDC hDC, int Phase)
 			IsSoft = false;
 			HideTarget = false;
 		}
+
+		//if(CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_NON_CONCERNED && FLIGHT_PLAN_STATE_NON_CONCERNED == 1)
+				//HideTarget = true;
 		//
 		// Final decision
 		//
@@ -501,8 +504,19 @@ void RadarScreen::OnRefresh(HDC hDC, int Phase)
 			// If final approach help is toggled, display the vectors
 			if (!IsPrimary && isCorrelated && ButtonsPressed[BUTTON_FIN]) {
 				if (CorrelatedFlightPlan.GetControllerAssignedData().GetClearedAltitude() == 1) {
+					double ftdisp = radarTarget.GetPosition().GetReportedGS()
+					double TBS = (160.0 * 92.0 / 3600.0) + 3.0 + (160.0 * 92.0 / 3600.0) * (160.0 / ftdisp - 1.0);
 					bool existsInList = find(ExtendedAppVector.begin(), ExtendedAppVector.end(), string(radarTarget.GetCallsign())) != ExtendedAppVector.end();
-					CRect r = AcSymbols::DrawApproachVector(&dc, this, radarTarget, existsInList ? 5 : 5);
+					CRect r = AcSymbols::DrawApproachVector(&dc, this, radarTarget, existsInList ? TBS : 5);
+					AddScreenObject(SCREEN_AC_APP_ARROW, radarTarget.GetCallsign(), r, true, "");
+				}
+			}
+			if (!IsPrimary && isCorrelated && ButtonsPressed[BUTTON_FIN]) {
+				if (CorrelatedFlightPlan.GetControllerAssignedData().GetClearedAltitude() == 1) {
+					bool existsInList = find(ExtendedAppVector.begin(), ExtendedAppVector.end(), string(radarTarget.GetCallsign())) != ExtendedAppVector.end();
+					double ftdisp = radarTarget.GetPosition().GetReportedGS()
+					double TBS = (160.0 * 164.0 / 3600.0) + 3.0 + (160.0 * 92.0 / 3600.0) * (160.0 / ftdisp - 1.0);
+					CRect r = AcSymbols::DrawApproachVector(&dc, this, radarTarget, existsInList ? TBS : 5);
 					AddScreenObject(SCREEN_AC_APP_ARROW, radarTarget.GetCallsign(), r, true, "");
 				}
 			}
