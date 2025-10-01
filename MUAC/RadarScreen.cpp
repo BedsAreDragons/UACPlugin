@@ -441,6 +441,7 @@ void RadarScreen::OnRefresh(HDC hDC, int Phase)
 		if (IsPrimary) {
 			AcState = TagConfiguration::TagStates::NotConcerned;
 			IsSoft = false;
+			HideTarget = true;
 		}
 
 		// if in a state that needs to force filters

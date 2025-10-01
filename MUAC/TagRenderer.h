@@ -52,7 +52,7 @@ public:
 
 		if (tag.TagState == TagConfiguration::TagStates::Next ||
 			tag.TagState == TagConfiguration::TagStates::InSequence) {
-			SecondaryColor = Colours::AircraftGreen.ToCOLORREF();
+			SecondaryColor = Colours::White.ToCOLORREF();
 		}
 
 		if (tag.TagState == TagConfiguration::TagStates::TransferredToMe) {

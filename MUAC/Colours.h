@@ -15,6 +15,8 @@ namespace Colours {
 	const Color LightOrange(224, 160, 0);
 	const Color AirwayBlue(0, 170, 170);
 	const Color RedWarning(255, 0, 0);
+	const Color White(255, 255, 255);
+
 
 	const Color YellowHighlight(255, 255, 0);
 	
