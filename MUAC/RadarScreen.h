@@ -71,9 +71,9 @@ private:
 	clock_t HalfSecondTimer;
 	bool Blink = false;
 
-	string AcquiringSepTool = "";
+	string AcquiringSepTool = " ";
 	string FixedQDMTool = "";
-	string RouteDisplayMouseOver = "";
+	string RouteDisplayMouseOver = "    ";
 	CRect RouteDisplayMouseOverArea;
 
 	struct RadarFiltersStruct {
