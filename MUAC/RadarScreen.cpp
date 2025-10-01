@@ -1018,7 +1018,7 @@ void RadarScreen::OnClickScreenObject(int ObjectType, const char * sObjectId, PO
 		if (ObjectType == SCREEN_TAG_STAR)
 			FunctionId = TAG_ITEM_FUNCTION_ASSIGNED_STAR;
 		
-		if (ObjectType == SCREEN_TAG_GSPEED || ObjectType == SCREEN_TAG_ADES)
+		if (ObjectType == TAG_ITEM_TYPE_GROUND_SPEED_WITH_N  || ObjectType == SCREEN_TAG_ADES)
 			FunctionId = TAG_ITEM_FUNCTION_OPEN_FP_DIALOG;
 
 		if (ObjectType == SCREEN_TAG_ASPEED) {
