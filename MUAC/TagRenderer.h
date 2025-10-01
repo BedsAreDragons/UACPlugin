@@ -46,7 +46,7 @@ public:
 		}
 
 		if (tag.TagState == TagConfiguration::TagStates::Assumed) {
-			PrimaryColor = Colours::AircraftGreen.ToCOLORREF();
+			PrimaryColor = Colours::White.ToCOLORREF();
 			SecondaryColor = Colours::AircraftGreen.ToCOLORREF();
 		}
 
@@ -137,6 +137,7 @@ public:
 					dc->SelectObject(&YellowPen);
 					dc->SelectStockObject(NULL_BRUSH);
 					dc->Rectangle(TextBox);
+					//SecondaryColor = Colours::YellowWarning.ToCOLORREF();
 				}
 				
 				if (needYellowUnderline) {
@@ -145,6 +146,7 @@ public:
 					dc->SelectStockObject(NULL_BRUSH);
 					dc->MoveTo(TextBox.left, TextBox.bottom);
 					dc->LineTo(TextBox.right, TextBox.bottom);
+					//SecondaryColor = Colours::MTCA.ToCOLORREF();
 				}
 
 				// if Detailed, then we store the area for click
