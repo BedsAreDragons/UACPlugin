@@ -463,7 +463,7 @@ void RadarScreen::OnRefresh(HDC hDC, int Phase)
 			HideTarget = false;
 		}
 
-		if(CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_NON_CONCERNED)
+		if(CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_NON_CONCERNED && FLIGHT_PLAN_STATE_NON_CONCERNED == 1)
 				HideTarget = true;
 		//
 		// Final decision
