@@ -421,7 +421,7 @@ void RadarScreen::OnRefresh(HDC hDC, int Phase)
 		
 		// Determining the tag state
 		if (isCorrelated) {
-			if(AcState = TagConfiguration::TagStates::NotConcerned)
+			if(CorrelatedFlightPlan.GetState() == !FLIGHT_PLAN_STATE_NOTIFIED)
 				HideTarget = true;
 			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_NOTIFIED)
 				AcState = TagConfiguration::TagStates::InSequence;
