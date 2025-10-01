@@ -419,29 +419,38 @@ void RadarScreen::OnRefresh(HDC hDC, int Phase)
 			
 		bool isDetailed = DetailedTag == radarTarget.GetCallsign();
 		
+		HideTarget = true;
+
 		// Determining the tag state
 		if (isCorrelated) {
-			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_NOTIFIED)
+			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_NOTIFIED){
 				AcState = TagConfiguration::TagStates::InSequence;
 				HideTarget = false;
-			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_COORDINATED)
+			}
+			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_COORDINATED){
 				AcState = TagConfiguration::TagStates::Next;
 				HideTarget = false;
-			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_TRANSFER_TO_ME_INITIATED)
+			}
+			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_TRANSFER_TO_ME_INITIATED){
 				AcState = TagConfiguration::TagStates::TransferredToMe;
 				HideTarget = false;
-			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_TRANSFER_FROM_ME_INITIATED)
+			}
+			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_TRANSFER_FROM_ME_INITIATED){
 				AcState = TagConfiguration::TagStates::TransferredFromMe;
 				HideTarget = false;
-			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_ASSUMED)
+			}
+			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_ASSUMED){
 				AcState = TagConfiguration::TagStates::Assumed;
 				HideTarget = false;
-			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_REDUNDANT)
+			}
+			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_REDUNDANT){
 				AcState = TagConfiguration::TagStates::Redundant;
 				HideTarget = false;
+			}
 		}
 		else{ 
 			AcState = TagConfiguration::TagStates::Uncorrelated;
+			HideTarget = true;
 		}
 
 		if (IsPrimary) {
@@ -462,9 +471,6 @@ void RadarScreen::OnRefresh(HDC hDC, int Phase)
 			IsSoft = false;
 			HideTarget = false;
 		}
-
-		if(CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_NON_CONCERNED && FLIGHT_PLAN_STATE_NON_CONCERNED == 1)
-				HideTarget = true;
 		//
 		// Final decision
 		//
