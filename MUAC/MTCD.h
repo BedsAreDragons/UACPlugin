@@ -14,8 +14,8 @@ class CMTCD
 {
 public:
 	int mtcd_distance = 9;
-	int mtcd_height = 950;
-	int mtcd_disable_level = 10500;
+	int mtcd_height = 2000;
+	int mtcd_disable_level = 8000;
 	int max_extrapolate_time = 20;
 
 	int start_time = CSTCA::time_to_extrapolate/60;
