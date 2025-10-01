@@ -425,16 +425,22 @@ void RadarScreen::OnRefresh(HDC hDC, int Phase)
 				HideTarget = true;
 			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_NOTIFIED)
 				AcState = TagConfiguration::TagStates::InSequence;
+				HideTarget = false;
 			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_COORDINATED)
 				AcState = TagConfiguration::TagStates::Next;
+				HideTarget = false;
 			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_TRANSFER_TO_ME_INITIATED)
 				AcState = TagConfiguration::TagStates::TransferredToMe;
+				HideTarget = false;
 			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_TRANSFER_FROM_ME_INITIATED)
 				AcState = TagConfiguration::TagStates::TransferredFromMe;
+				HideTarget = false;
 			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_ASSUMED)
 				AcState = TagConfiguration::TagStates::Assumed;
+				HideTarget = false;
 			if (CorrelatedFlightPlan.GetState() == FLIGHT_PLAN_STATE_REDUNDANT)
 				AcState = TagConfiguration::TagStates::Redundant;
+				HideTarget = false;
 		}
 		else{ 
 			AcState = TagConfiguration::TagStates::Uncorrelated;
