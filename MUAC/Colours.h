@@ -18,7 +18,7 @@ namespace Colours {
 
 	const Color YellowHighlight(255, 255, 0);
 	
-	const Color DarkBlueMenu(132, 136, 145);
+	const Color DarkBlueMenu(86, 88, 94);
 	const Color LightBlueMenu(255, 255, 255);
 	const Color MenuButtonTop(165, 165, 165);
 	const Color MenuButtonBottom(74, 74, 74);
