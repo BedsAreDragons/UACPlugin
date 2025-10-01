@@ -1,18 +1,19 @@
-# Upper Area Control PlugIn [![Build status](https://ci.appveyor.com/api/projects/status/w0v23weq4dw9e9t7?svg=true)](https://ci.appveyor.com/project/pierr3/UACPlugin)
+# Upper Area Control PlugIn [![Build status](https://ci.appveyor.com/api/projects/status/w0v23weq4dw9e9t7?svg=true)](https://ci.appveyor.com/project/BedsAreDragons/UACPlugin)
 
 <p align="center">
 	<img alt="UAC PlugIn header" src="https://pierr3.github.io/UACPlugin/img/header.png"/>
 </p>
 
-This plugin simulates an ATC HMI resembling systems using by large European Air Traffic Control providers, specially en route. The plugin supports an en route mode and an approach mode, allowing for full topdown control (excluding ground control). It features a number of advanced systems, while still being light and usable:
+This plugin simulates an ATC HMI resembling systems used by large European Air Traffic Control providers, especially en route. The plugin supports an en route mode and an approach mode, allowing for full top-down control (excluding ground control). It features a number of advanced systems, while still being light and usable:
  * En route control & approach control mode
- * Custom drawn tags, with custom realistic behaviour
+ * Custom-drawn tags, with custom, realistic behaviour
  * Realistic filtering (by levels, VFRs, Primary)
- * Precise separation tool (min distance), custom STCA (no alert sound), cutom MTCD
- * Anti-overlap algorithm based on weighted grid system, meaning tags automatically move to not overlap
+ * Precise separation tool (min distance), custom STCA (no alert sound), custom MTCD
+ * Anti-overlap algorithm based on a weighted grid system, meaning tags automatically move so that they do not overlap
  * Full support for coordination mechanisms from EuroScope
  * Display of max and minimum speeds
  * Display of mode S reported heading
+ * Final approach indicators with TBS
  
  Download the most recent development (nightly) build here:
  
