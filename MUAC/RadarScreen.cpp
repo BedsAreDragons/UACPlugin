@@ -503,22 +503,23 @@ void RadarScreen::OnRefresh(HDC hDC, int Phase)
 
 			// If final approach help is toggled, display the vectors
 			if (!IsPrimary && isCorrelated && ButtonsPressed[BUTTON_FIN]) {
-				if (CorrelatedFlightPlan.GetControllerAssignedData().GetClearedAltitude() == 1) {
-					double ftdisp = radarTarget.GetPosition().GetReportedGS();
-					double TBS = (160.0 * 92.0 / 3600.0) + 3.0 + (160.0 * 92.0 / 3600.0) * (160.0 / ftdisp - 1.0);
-					bool existsInList = find(ExtendedAppVector.begin(), ExtendedAppVector.end(), string(radarTarget.GetCallsign())) != ExtendedAppVector.end();
-					CRect r = AcSymbols::DrawApproachVector(&dc, this, radarTarget, existsInList ? 5 : TBS);
-					AddScreenObject(SCREEN_AC_APP_ARROW, radarTarget.GetCallsign(), r, true, "");
-				}
-			}
-			if (!IsPrimary && isCorrelated && ButtonsPressed[BUTTON_FIN]) {
-				if (CorrelatedFlightPlan.GetControllerAssignedData().GetClearedAltitude() == 1) {
-					bool existsInList = find(ExtendedAppVector.begin(), ExtendedAppVector.end(), string(radarTarget.GetCallsign())) != ExtendedAppVector.end();
-					double ftdisp = radarTarget.GetPosition().GetReportedGS();
-					double TBS = (160.0 * 164.0 / 3600.0) + 3.0 + (160.0 * 92.0 / 3600.0) * (160.0 / ftdisp - 1.0);
-					CRect r = AcSymbols::DrawApproachVector(&dc, this, radarTarget, existsInList ? 5 : TBS);
-					AddScreenObject(SCREEN_AC_APP_ARROW, radarTarget.GetCallsign(), r, true, "");
-				}
+				// Lead aircraft speed
+				double ftdisp = radarTarget.GetPosition().GetReportedGS();
+				double trailingSpeed = 160.0;
+
+				// Calculate both TBS distances
+				double TBS_92  = (trailingSpeed * 92.0 / 3600.0)  + 3.0 + (trailingSpeed * 92.0 / 3600.0) * (trailingSpeed / ftdisp - 1.0);
+				double TBS_164 = (trailingSpeed * 164.0 / 3600.0) + 3.0 + (trailingSpeed * 92.0 / 3600.0) * (trailingSpeed / ftdisp - 1.0);
+
+				// Check if target exists in extended approach vector list
+				bool existsInList = find(ExtendedAppVector.begin(), ExtendedAppVector.end(), string(radarTarget.GetCallsign())) != ExtendedAppVector.end();
+
+				// Draw both approach vectors
+				CRect r1 = AcSymbols::DrawApproachVector(&dc, this, radarTarget, existsInList ? 5 : TBS_92);
+				AddScreenObject(SCREEN_AC_APP_ARROW, radarTarget.GetCallsign(), r1, true, "");
+
+				CRect r2 = AcSymbols::DrawApproachVector(&dc, this, radarTarget, existsInList ? 5 : TBS_164);
+				AddScreenObject(SCREEN_AC_APP_ARROW, radarTarget.GetCallsign(), r2, true, "");
 			}
 		}
 
