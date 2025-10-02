@@ -149,7 +149,7 @@ public:
 					SecondaryColor = Colours::YellowWarning.ToCOLORREF();
 				}
 
-				//if an aircraft 
+				//if an aircraft is MTCD
 				if (isMtcd = false) {
 					SecondaryColor = Colours::White.ToCOLORREF();
 					if (!tag.IsSoft) {
