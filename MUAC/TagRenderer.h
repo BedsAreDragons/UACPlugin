@@ -138,11 +138,9 @@ public:
 					dc->SelectObject(&YellowPen);
 					dc->SelectStockObject(NULL_BRUSH);
 					dc->Rectangle(TextBox);
-					SecondaryColor = Colours::YellowWarning.ToCOLORREF();
 				}
 				
 				if (needYellowUnderline) {
-					SecondaryColor = Colours::YellowWarning.ToCOLORREF();
 					CPen YellowPen(PS_SOLID, 1, Colours::YellowWarning.ToCOLORREF());
 					dc->SelectObject(&YellowPen);
 					dc->SelectStockObject(NULL_BRUSH);
