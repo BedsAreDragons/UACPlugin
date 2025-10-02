@@ -133,6 +133,7 @@ public:
 
 				// Here we also dispaly the rectangle if the mouse cursor is in it
 				if (((IsInRect(MousePt, TextBox) && isDetailed) || ((isStca || isMtcd) && TagItem.TagType == "Callsign")) && TagItem.TagType != " ") {
+					SecondaryColor = Colours::YellowWarning.ToCOLORREF();
 					CPen YellowPen(PS_SOLID, 1, Colours::YellowWarning.ToCOLORREF());
 					dc->SelectObject(&YellowPen);
 					dc->SelectStockObject(NULL_BRUSH);
@@ -141,15 +142,17 @@ public:
 				}
 				
 				if (needYellowUnderline) {
+					SecondaryColor = Colours::YellowWarning.ToCOLORREF();
 					CPen YellowPen(PS_SOLID, 1, Colours::YellowWarning.ToCOLORREF());
 					dc->SelectObject(&YellowPen);
 					dc->SelectStockObject(NULL_BRUSH);
 					dc->MoveTo(TextBox.left, TextBox.bottom);
 					dc->LineTo(TextBox.right, TextBox.bottom);
-					SecondaryColor = Colours::YellowWarning.ToCOLORREF();
 				}
 
-				//if an aircraft is MTCD
+				if (isMtcd = true)
+					SecondaryColor = Colours::YellowWarning.ToCOLORREF();
+				//if an aircraft is not MTCD
 				if (isMtcd = false) {
 					SecondaryColor = Colours::White.ToCOLORREF();
 					if (!tag.IsSoft) {
