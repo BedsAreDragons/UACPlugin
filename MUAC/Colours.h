@@ -6,7 +6,7 @@ using namespace Gdiplus;
 namespace Colours {
 	const Color AircraftGreen(67, 255, 67); // 28, 190, 32
 	const Color AircraftBlue(111, 177, 203);
-	const Color AircraftLightGrey(255, 255, 255);
+	const Color AircraftLightGrey(140, 140, 140);
 	const Color AircraftDarkGrey(79, 79, 79);
 	const Color YellowWarning(167, 167, 0);
 	const Color PurpleDisplay(235, 0, 201);
