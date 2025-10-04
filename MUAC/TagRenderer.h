@@ -133,7 +133,6 @@ public:
 
 				// Here we also dispaly the rectangle if the mouse cursor is in it
 				if (((IsInRect(MousePt, TextBox) && isDetailed) || ((isStca || isMtcd) && TagItem.TagType == "Callsign")) && TagItem.TagType != " ") {
-					SecondaryColor = Colours::YellowWarning.ToCOLORREF();
 					CPen YellowPen(PS_SOLID, 1, Colours::YellowWarning.ToCOLORREF());
 					dc->SelectObject(&YellowPen);
 					dc->SelectStockObject(NULL_BRUSH);
