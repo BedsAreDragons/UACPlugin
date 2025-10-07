@@ -147,38 +147,6 @@ public:
 					dc->LineTo(TextBox.right, TextBox.bottom);
 				}
 
-				if (isMtcd = true)
-					SecondaryColor = Colours::YellowWarning.ToCOLORREF();
-				//if an aircraft is not MTCD
-				if (isMtcd = false) {
-					SecondaryColor = Colours::White.ToCOLORREF();
-					if (!tag.IsSoft) {
-						PrimaryColor = Colours::AircraftLightGrey.ToCOLORREF();
-						SecondaryColor = Colours::AircraftLightGrey.ToCOLORREF();
-					}
-
-					if (tag.TagState == TagConfiguration::TagStates::Redundant) {
-						SecondaryColor = Colours::AircraftBlue.ToCOLORREF();
-					}
-
-					if (tag.TagState == TagConfiguration::TagStates::Assumed) {
-						PrimaryColor = Colours::White.ToCOLORREF();
-						SecondaryColor = Colours::AircraftGreen.ToCOLORREF();
-					}
-
-					if (tag.TagState == TagConfiguration::TagStates::Next ||
-						tag.TagState == TagConfiguration::TagStates::InSequence) {
-						SecondaryColor = Colours::White.ToCOLORREF();
-					}
-
-					if (tag.TagState == TagConfiguration::TagStates::TransferredToMe) {
-						SecondaryColor = Colours::AircraftBlue.ToCOLORREF();
-					}
-
-					if (tag.TagState == TagConfiguration::TagStates::TransferredFromMe) {
-						PrimaryColor = Colours::AircraftGreen.ToCOLORREF();
-					}
-				}
 
 				// if Detailed, then we store the area for click
 				if (isDetailed && TagItem.ClickId != 0)
