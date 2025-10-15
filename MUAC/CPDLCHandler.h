@@ -1,28 +1,29 @@
 #pragma once
-#include <string>
-#include <vector>
-#include "HttpHelper.h"
-#include "Constants.h"
 
-using namespace std;
+#include "resource.h"
 
-class CPDLCHandler
+// CCPDLCSettingsDialog dialog
+
+class CCPDLCSettingsDialog : public CDialogEx
 {
+	DECLARE_DYNAMIC(CCPDLCSettingsDialog)
+
 public:
-	static inline void PollOnlineStations() {
-		string s = LoadHttpString("http://www.hoppie.nl/acars/system/connect.html?logon=&from=ALL-CALLSIGNS&to=ALL-CALLSIGNS&type=ping&packet=ALL-CALLSIGNS");
+	CCPDLCSettingsDialog(CWnd* pParent = NULL);   // standard constructor
+	virtual ~CCPDLCSettingsDialog();
 
-		if (s.size() > 0) {
-			CPDLCHandler::OnlineCPDLCStations.clear();
+	CString m_Logon;
+	CString m_Password;
+	int m_Sound;
 
-			s.erase(0, 4);
-			s.pop_back();
+// Dialog Data
+	enum { IDD = IDD_DIALOG2 };
 
-			
-		}
-	}
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
-	static vector<string> OnlineCPDLCStations;
-
+	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedSound();
+	afx_msg void OnBnClickedOk();
 };
-
