@@ -25,7 +25,7 @@ private:
 	bool Display = true;
 	bool Released = true;
 
-	string lengthString = "AAA0000 AAA0000 00 00 00.0 00.0 ^";
+	string lengthString = "AAA0000 AAA0000 00.0 00.0 ^";
 
 	int PaddingSides = 3;
 	int PaddingTops = 5;
@@ -187,7 +187,7 @@ public:
 			if (vera.minDistanceNm < 10)
 				veraDistance = "0" + veraDistance;
 
-			string line = kv.first + " " + kv.second + " 00 00 " + veraTime + " " + veraDistance;
+			string line = kv.first + " " + kv.second + " " + veraTime + " " + veraDistance;
 			CSize extent = dc->GetTextExtent(string(line + " ").c_str());
 
 			dc->TextOutA(TopBar.left + 3, TopOffset, line.c_str());
