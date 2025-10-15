@@ -1,10 +1,17 @@
 #pragma once
-#include <vector>
 #include <string>
-#include <WinInet.h>
-#include "Constants.h"
+#include <curl\curl.h>
+#include <curl\easy.h>
 
-using namespace std;
+class HttpHelper
+{
+private:
+	static std::string downloadedContents;
+	static size_t handle_data(void *ptr, size_t size, size_t nmemb, void *stream);
 
-string LoadHttpString(string url);
+public:
+	HttpHelper();
+	std::string downloadStringFromURL(std::string url);
+	~HttpHelper();
 
+};
