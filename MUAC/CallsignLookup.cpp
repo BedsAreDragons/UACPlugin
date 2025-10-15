@@ -5,7 +5,7 @@
 // CCallsignLookup Class by Even Rognlien, used with permission
 //
 
-bool CCallsignLookup::Available = false;
+bool CCallsignLookup::Available = true;
 CCallsignLookup* CCallsignLookup::Lookup = nullptr;
 
 CCallsignLookup::CCallsignLookup(std::string fileName) {
