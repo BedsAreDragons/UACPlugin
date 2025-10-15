@@ -8,6 +8,7 @@ This is my continued version that I am going to continue updating as pierr3 has 
 * TBS FTDi's
 * Tags based on BULATSA Systems
 * Anything else I decide to come up with
+* Working CPDLC implementation
 
 This plugin simulates an ATC HMI resembling systems used by large European Air Traffic Control providers, specially en route. The plugin supports an en route mode and an approach mode, allowing for full topdown control (excluding ground control). It features a number of advanced systems, while still being light and usable:
  * En route control & approach control mode
