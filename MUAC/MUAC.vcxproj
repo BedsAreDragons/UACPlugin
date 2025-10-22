@@ -136,7 +136,6 @@
     <ClInclude Include="CallsignLookup.h" />
     <ClInclude Include="Colours.h" />
     <ClInclude Include="Constants.h" />
-    <ClInclude Include="CPDLCHandler.h" />
     <ClInclude Include="FontManager.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="HttpHelper.h" />
@@ -159,7 +158,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CallsignLookup.cpp" />
-    <ClCompile Include="CPDLCHandler.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
