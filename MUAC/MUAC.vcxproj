@@ -139,7 +139,7 @@
     <ClInclude Include="CPDLCHandler.h" />
     <ClInclude Include="FontManager.h" />
     <ClInclude Include="Helper.h" />
-    <ClInclude Include="HttpHelper.h" />
+    <ClInclude Include="HttpHelper.hpp" />
     <ClInclude Include="MenuBar.h" />
     <ClInclude Include="MTCD.h" />
     <ClInclude Include="MTCDWindow.h" />
