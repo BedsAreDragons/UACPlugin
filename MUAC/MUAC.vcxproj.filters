@@ -90,8 +90,6 @@
     <ClInclude Include="PopoutMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CPDLCHandler.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -116,8 +114,6 @@
     <ClCompile Include="HttpHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CPDLCHandler.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
