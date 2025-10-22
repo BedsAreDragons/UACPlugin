@@ -16,11 +16,6 @@ public:
 	MUAC();
 	virtual ~MUAC();
 
-	//---OnCompileCommand------------------------------------------
-
-	virtual bool OnCompileCommand(const char * sCommandLine);
-
-
 	CRadarScreen * OnRadarScreenCreated(const char * sDisplayName, bool NeedRadarContent, bool GeoReferenced, bool CanBeSaved, bool CanBeCreated);
 
 	void OnTimer(int Counter);
