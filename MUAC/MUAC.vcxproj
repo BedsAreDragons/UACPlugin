@@ -92,24 +92,39 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;NDEBUG;_WINDOWS;_USRDLL;MUAC_EXPORTS;%(PreprocessorDefinitions);CURL_STATICLIB;CURL_STATIC;..\lib\libcurld.lib</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\lib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)\lib\EuroScopePlugInDll.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
+  <ClCompile>
+    <WarningLevel>Level3</WarningLevel>
+    <PrecompiledHeader>Use</PrecompiledHeader>
+    <Optimization>MaxSpeed</Optimization>
+    <FunctionLevelLinking>true</FunctionLevelLinking>
+    <IntrinsicFunctions>true</IntrinsicFunctions>
+    <PreprocessorDefinitions>
+      WIN32;_CRT_SECURE_NO_WARNINGS;NDEBUG;_WINDOWS;_USRDLL;MUAC_EXPORTS;
+      %(PreprocessorDefinitions);
+      CURL_STATICLIB;CURL_STATIC
+    </PreprocessorDefinitions>
+    <SDLCheck>true</SDLCheck>
+    <AdditionalIncludeDirectories>$(SolutionDir)\lib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+  </ClCompile>
+
+  <Link>
+    <SubSystem>Windows</SubSystem>
+    <EnableCOMDATFolding>true</EnableCOMDATFolding>
+    <OptimizeReferences>true</OptimizeReferences>
+    <GenerateDebugInformation>true</GenerateDebugInformation>
+    <AdditionalDependencies>
+      $(SolutionDir)\lib\EuroScopePlugInDll.lib;
+      $(SolutionDir)\lib\libcurl.lib;
+      ws2_32.lib;
+      wldap32.lib;
+      advapi32.lib;
+      crypt32.lib;
+      normaliz.lib;
+      %(AdditionalDependencies)
+    </AdditionalDependencies>
+  </Link>
+</ItemDefinitionGroup>
+
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
