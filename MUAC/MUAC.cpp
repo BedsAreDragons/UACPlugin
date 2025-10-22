@@ -31,7 +31,7 @@ MUAC::MUAC():CPlugIn(COMPATIBILITY_CODE, PLUGIN_NAME.c_str(), PLUGIN_VERSION.c_s
 
 MUAC::~MUAC() {}
 
-/*bool MUAC::OnCompileCommand(const char * sCommandLine) {
+bool MUAC::OnCompileCommand(const char * sCommandLine) {
 	if (startsWith(".uac connect", sCommandLine))
 	{
 		if (ControllerMyself().IsController()) {
@@ -83,7 +83,7 @@ MUAC::~MUAC() {}
 		return true;
 	}
 	return false;
-}*/
+}
 
 CRadarScreen * MUAC::OnRadarScreenCreated(const char * sDisplayName, bool NeedRadarContent, bool GeoReferenced, bool CanBeSaved, bool CanBeCreated)
 {
