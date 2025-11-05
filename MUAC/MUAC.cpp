@@ -26,8 +26,6 @@ string logonCallsign = "EGKK";
 HttpHelper* httpHelper = nullptr;
 static int messageId = 0;
 
-HttpHelper* httpHelper = nullptr;
-
 MUAC::MUAC() :
     CPlugIn(COMPATIBILITY_CODE, PLUGIN_NAME.c_str(),
         PLUGIN_VERSION.c_str(), PLUGIN_AUTHOR.c_str(), PLUGIN_COPY.c_str())
