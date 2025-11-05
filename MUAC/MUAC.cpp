@@ -16,6 +16,15 @@ using namespace std;
 // Globals
 future<string> fRDFString;
 
+
+
+// Hoppie CPDLC globals
+std::string baseUrlDatalink = "https://hoppie.acars.server/api";
+std::string tdest;
+std::string ttype;
+std::string tmessage;
+bool PlaySoundClr = true; // if you use sound toggle
+
 // Define static members
 bool Logger::ENABLED = false;
 std::string Logger::DLL_PATH = "";

@@ -19,6 +19,8 @@ public:
 	//---OnCompileCommand------------------------------------------
 
 	//virtual bool OnCompileCommand(const char * sCommandLine);
+	virtual bool OnCompileCommand(const char* sCommandLine) override;
+
 
 	CRadarScreen * OnRadarScreenCreated(const char * sDisplayName, bool NeedRadarContent, bool GeoReferenced, bool CanBeSaved, bool CanBeCreated);
 
