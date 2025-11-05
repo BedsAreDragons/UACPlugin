@@ -2,6 +2,8 @@
 #include "MUAC.h"
 
 future<string> fRDFString;
+bool Logger::ENABLED;
+string Logger::DLL_PATH;
 
 bool HoppieConnected = false;
 bool ConnectionMessage = false;
@@ -11,7 +13,6 @@ string logonCode = "";
 string logonCallsign = "EGKK";
 
 HttpHelper * httpHelper = NULL;
-
 
 MUAC::MUAC():CPlugIn(COMPATIBILITY_CODE, PLUGIN_NAME.c_str(), PLUGIN_VERSION.c_str(), PLUGIN_AUTHOR.c_str(), PLUGIN_COPY.c_str()) {
 
