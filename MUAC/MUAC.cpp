@@ -66,7 +66,7 @@ struct AcarsMessage {
 // ============================================================================
 // Globals
 // ============================================================================
-static HttpHelper* httpHelper = nullptr;
+
 static DatalinkPacket DatalinkToSend;
 
 static string logonCallsign;
