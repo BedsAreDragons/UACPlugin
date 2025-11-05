@@ -2,6 +2,8 @@
 #include "MUAC.h"
 #include "HttpHelper.h"  // <-- needed
 #include "Logger.h"      // <-- needed
+#include "CPDLCSettingsDialog.h"
+
 
 #include <string>
 #include <vector>
@@ -81,24 +83,23 @@ MUAC::MUAC() :
 
 }
 
-MUAC::~MUAC() {}
-
 bool MUAC::OnCompileCommand(const char* sCommandLine) {
     if (startsWith(".hoppie connect", sCommandLine)) {
         if (!HoppieConnected) {
-            CHoppieLogonDialog dlg;
-            dlg.m_LogonCallsign = logonCallsign.c_str();
-            dlg.m_LogonCode = logonCode.c_str();
-            dlg.m_PlaySound = PlaySoundClr;
+            CCPDLCSettingsDialog dlg;
+            dlg.m_Logon = logonCallsign.c_str();
+            dlg.m_Password = logonCode.c_str();
+            dlg.m_Sound = PlaySoundClr ? 1 : 0;
 
             if (dlg.DoModal() == IDOK) {
-                logonCallsign = dlg.m_LogonCallsign;
-                logonCode = dlg.m_LogonCode;
-                PlaySoundClr = dlg.m_PlaySound;
+                logonCallsign = dlg.m_Logon;
+                logonCode = dlg.m_Password;
+                PlaySoundClr = dlg.m_Sound != 0;
 
-                // save to settings
+                // save settings
                 SaveDataToSettings("hoppie_logon", "Hoppie ACARS Callsign", logonCallsign.c_str());
                 SaveDataToSettings("hoppie_code", "Hoppie ACARS Logon Code", logonCode.c_str());
+                SaveDataToSettings("hoppie_sound", "Play sound on clearance request", std::to_string(PlaySoundClr).c_str());
 
                 // perform login
                 _beginthread(datalinkLogin, 0, nullptr);
@@ -110,9 +111,9 @@ bool MUAC::OnCompileCommand(const char* sCommandLine) {
         return true;
     }
 
-    // other commands...
     return false;
 }
+
 
 
 void sendHoppieMessage(void* arg) {
