@@ -18,6 +18,7 @@ using namespace std;
 // Globals
 future<string> fRDFString;
 
+void datalinkLogin(void* arg);  // forward declaration
 
 
 // Hoppie CPDLC globals
@@ -41,6 +42,28 @@ string logonCallsign = "EGKK";
 
 HttpHelper* httpHelper = nullptr;
 static int messageId = 0;
+
+void datalinkLogin(void* arg) {
+    if (!httpHelper) return;
+
+    string raw;
+    string url = baseUrlDatalink;
+    url += "?logon=" + logonCode;
+    url += "&from=" + logonCallsign;
+    url += "&to=SERVER&type=PING";
+
+    raw = httpHelper->downloadStringFromURL(url);
+
+    if (startsWith("ok", raw.c_str())) {
+        HoppieConnected = true;
+        ConnectionMessage = true;
+        DisplayUserMessage("Hoppie ACARS", "Server", "Connected!", true, true, false, true, false);
+    } else {
+        FailedToConnectMessage = true;
+        DisplayUserMessage("Hoppie ACARS", "Server", "Failed to connect!", true, true, false, true, false);
+    }
+}
+
 
 MUAC::MUAC() :
     CPlugIn(COMPATIBILITY_CODE, PLUGIN_NAME.c_str(),

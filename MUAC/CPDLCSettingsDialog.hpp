@@ -1,6 +1,9 @@
 #pragma once
 
 #include "resource.h"
+#include <afxwin.h>   // Base MFC classes like CWnd, CDialogEx
+#include <afxext.h>   // Extended MFC stuff
+
 
 // CCPDLCSettingsDialog dialog
 
