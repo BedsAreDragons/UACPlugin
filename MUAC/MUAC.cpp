@@ -63,7 +63,8 @@ MUAC::MUAC() :
 
     // ---- Init Random ID and Logging ----
     messageId = rand() % 10000 + 1000;
-    Logger::log("MUAC Datalink initialized.");
+   Logger::info("MUAC Datalink initialized.");
+
 }
 
 MUAC::~MUAC() {}
