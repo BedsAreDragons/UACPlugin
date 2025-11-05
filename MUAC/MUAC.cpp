@@ -1,6 +1,19 @@
 #include "stdafx.h"
 #include "MUAC.h"
+#include "HttpHelper.h"  // <-- needed
+#include "Logger.h"      // <-- needed
 
+#include <string>
+#include <vector>
+#include <map>
+#include <future>
+#include <cstdlib>
+#include <ctime>
+#include <sstream>
+
+using namespace std;
+
+// Globals
 future<string> fRDFString;
 
 bool HoppieConnected = false;
@@ -9,6 +22,9 @@ bool FailedToConnectMessage = false;
 
 string logonCode = "";
 string logonCallsign = "EGKK";
+
+HttpHelper* httpHelper = nullptr;
+static int messageId = 0;
 
 HttpHelper* httpHelper = nullptr;
 
