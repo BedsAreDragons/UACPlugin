@@ -74,6 +74,72 @@ MUAC::MUAC() :
 
 MUAC::~MUAC() {}
 
+bool MUAC::OnCompileCommand(const char* sCommandLine) {
+    if (startsWith(".hoppie connect", sCommandLine)) {
+        if (!HoppieConnected) {
+            CHoppieLogonDialog dlg;
+            dlg.m_LogonCallsign = logonCallsign.c_str();
+            dlg.m_LogonCode = logonCode.c_str();
+            dlg.m_PlaySound = PlaySoundClr;
+
+            if (dlg.DoModal() == IDOK) {
+                logonCallsign = dlg.m_LogonCallsign;
+                logonCode = dlg.m_LogonCode;
+                PlaySoundClr = dlg.m_PlaySound;
+
+                // save to settings
+                SaveDataToSettings("hoppie_logon", "Hoppie ACARS Callsign", logonCallsign.c_str());
+                SaveDataToSettings("hoppie_code", "Hoppie ACARS Logon Code", logonCode.c_str());
+
+                // perform login
+                _beginthread(datalinkLogin, 0, nullptr);
+            }
+        } else {
+            HoppieConnected = false;
+            DisplayUserMessage("Hoppie ACARS", "Server", "Logged off!", true, true, false, true, false);
+        }
+        return true;
+    }
+
+    // other commands...
+    return false;
+}
+
+
+void sendHoppieMessage(void* arg) {
+    string raw;
+    string url = baseUrlDatalink;
+    url += "?logon=" + logonCode;
+    url += "&from=" + logonCallsign;
+    url += "&to=" + tdest;
+    url += "&type=" + ttype;
+    url += "&packet=" + tmessage;
+
+    // Encode spaces
+    size_t pos = 0;
+    while ((pos = url.find(" ", pos)) != string::npos) {
+        url.replace(pos, 1, "%20");
+        pos += 3;
+    }
+
+    raw = httpHelper->downloadStringFromURL(url);
+
+    if (startsWith("ok", raw.c_str())) {
+        // handle successful send
+    }
+}
+
+void pollHoppieMessages(void* arg) {
+    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=SERVER&type=POLL";
+    string raw = httpHelper->downloadStringFromURL(url);
+
+    if (!startsWith("ok", raw.c_str()) || raw.size() <= 3) return;
+
+    // parse messages like in your example
+}
+
+
+
 CRadarScreen * MUAC::OnRadarScreenCreated(const char * sDisplayName, bool NeedRadarContent, bool GeoReferenced, bool CanBeSaved, bool CanBeCreated)
 {
 	if (!strcmp(sDisplayName, MUAC_RADAR_SCREEN_VIEW))
