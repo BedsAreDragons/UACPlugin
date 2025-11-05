@@ -16,6 +16,11 @@ using namespace std;
 // Globals
 future<string> fRDFString;
 
+// Define static members
+bool Logger::ENABLED = false;
+std::string Logger::DLL_PATH = "";
+
+
 bool HoppieConnected = false;
 bool ConnectionMessage = false;
 bool FailedToConnectMessage = false;

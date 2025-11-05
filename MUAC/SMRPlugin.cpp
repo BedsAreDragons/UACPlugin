@@ -8,6 +8,12 @@ bool HoppieConnected = false;
 bool ConnectionMessage = false;
 bool FailedToConnectMessage = false;
 
+// Define static members
+bool Logger::ENABLED = false;
+std::string Logger::DLL_PATH = "";
+
+
+
 string logonCode = "";
 string logonCallsign = "EGKK";
 
