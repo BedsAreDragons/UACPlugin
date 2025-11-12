@@ -1,7 +1,7 @@
 // MUAC.cpp
 #include "stdafx.h"
 #include "MUAC.h"
-#include "CPDLCSettingsDialog.hpp"
+#include "CPDLCSettingsDialog.h"  
 #include "HttpHelper.h"
 #include "Logger.h"
 #include "CallsignLookup.h"

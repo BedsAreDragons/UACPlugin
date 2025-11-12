@@ -2,8 +2,10 @@
 //
 
 #include "stdafx.h"
-#include "CPDLCSettingsDialog.hpp"
+#include "CPDLCSettingsDialog.h"
 #include "afxdialogex.h"
+
+
 
 
 // CCPDLCSettingsDialog dialog
