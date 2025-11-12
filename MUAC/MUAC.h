@@ -13,22 +13,15 @@ using namespace EuroScopePlugIn;
 class MUAC : public CPlugIn
 {
 public:
-	MUAC();
-	virtual ~MUAC();
+    MUAC();
+    virtual ~MUAC();
 
-	//---OnCompileCommand------------------------------------------
+    static MUAC* Instance; // <-- must be inside class
 
-	//virtual bool OnCompileCommand(const char * sCommandLine);
-	virtual bool OnCompileCommand(const char* sCommandLine) override;
-
-
-	CRadarScreen * OnRadarScreenCreated(const char * sDisplayName, bool NeedRadarContent, bool GeoReferenced, bool CanBeSaved, bool CanBeCreated);
-
-	void OnTimer(int Counter);
+    virtual bool OnCompileCommand(const char* sCommandLine) override;
+    CRadarScreen* OnRadarScreenCreated(const char* sDisplayName, bool NeedRadarContent, bool GeoReferenced, bool CanBeSaved, bool CanBeCreated);
+    void OnTimer(int Counter);
 
 protected:
-	void RegisterPlugin();
-
-private:
-
+    void RegisterPlugin();
 };
