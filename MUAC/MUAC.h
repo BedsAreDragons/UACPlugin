@@ -10,7 +10,7 @@
 using namespace std;
 using namespace EuroScopePlugIn;
 
-class MUAC : CPlugIn
+class MUAC : public CPlugIn
 {
 public:
 	MUAC();
