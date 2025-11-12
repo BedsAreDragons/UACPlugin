@@ -41,7 +41,8 @@ string Logger::DLL_PATH = "";
 
 // ----------------- Functions -----------------
 void datalinkLogin(void* arg) {
-    if (!httpHelper) return;
+    MUAC* plugin = static_cast<MUAC*>(arg); // cast argument to MUAC*
+    if (!httpHelper || !plugin) return;
 
     string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=SERVER&type=PING";
     string raw = httpHelper->downloadStringFromURL(url);
@@ -49,12 +50,14 @@ void datalinkLogin(void* arg) {
     if (raw.find("ok") == 0) {
         HoppieConnected = true;
         ConnectionMessage = true;
-        DisplayUserMessage("Hoppie ACARS", "Server", "Connected!", true, true, false, true, false);
+        plugin->DisplayUserMessage("Hoppie ACARS", "Server", "Connected!", true, true, false, true, false);
+
     } else {
         FailedToConnectMessage = true;
-        DisplayUserMessage("Hoppie ACARS", "Server", "Failed to connect!", true, true, false, true, false);
+        plugin->DisplayUserMessage("Hoppie ACARS", "Server", "Failed to connect!", true, true, false, true, false);
     }
 }
+
 
 bool MUAC::OnCompileCommand(const char* sCommandLine) {
     if (startsWith(".hoppie connect", sCommandLine)) {
