@@ -1,4 +1,3 @@
-// MUAC.cpp
 #include "stdafx.h"
 #include "MUAC.h"
 #include "CPDLCSettingsDialog.h"  
@@ -39,16 +38,15 @@ void pollHoppieMessages();
 // MUAC class
 // ------------------------
 
-MUAC* MUAC::Instance = nullptr;
-
-
+MUAC* MUAC::Instance = nullptr;  // <-- static pointer definition
 
 MUAC::MUAC()
     : CPlugIn(COMPATIBILITY_CODE, PLUGIN_NAME.c_str(),
               PLUGIN_VERSION.c_str(), PLUGIN_AUTHOR.c_str(), PLUGIN_COPY.c_str())
 {
-    MUAC::Instance = this;
-	srand(static_cast<unsigned int>(time(nullptr)));
+    MUAC::Instance = this;  // <-- assign inside constructor
+
+    srand(static_cast<unsigned int>(time(nullptr)));
     RegisterPlugin();
 
     DisplayUserMessage("MUAC", "MUAC PlugIn",
@@ -82,7 +80,8 @@ bool MUAC::OnCompileCommand(const char* sCommandLine)
     {
         if (!HoppieConnected)
         {
-            CPDLCSettingsDialog dlg(nullptr);
+            // <-- create the dialog correctly
+            CPDLCSettingsDialog dlg(nullptr);  
             dlg.m_Logon = logonCallsign.c_str();
             dlg.m_Password = logonCode.c_str();
             dlg.m_Sound = PlaySoundClr ? 1 : 0;
@@ -173,7 +172,6 @@ void datalinkLogin()
     }
 }
 
-
 // ------------------------
 // Send Hoppie message
 // ------------------------
@@ -183,7 +181,6 @@ void sendHoppieMessage()
 
     string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=" + tdest + "&type=" + ttype + "&packet=" + tmessage;
 
-    // Encode spaces
     size_t pos = 0;
     while ((pos = url.find(" ", pos)) != string::npos)
     {
