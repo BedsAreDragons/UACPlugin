@@ -1,8 +1,9 @@
 #include "stdafx.h"
+#include "CPDLCSettingsDialog.hpp"
 #include "MUAC.h"
 #include "HttpHelper.h"  // <-- needed
 #include "Logger.h"      // <-- needed
-#include "CPDLCSettingsDialog.hpp"
+
 
 
 #include <string>
