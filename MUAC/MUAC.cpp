@@ -40,6 +40,8 @@ void pollHoppieMessages();
 // ------------------------
 
 MUAC* MUAC::Instance = nullptr;
+MUAC::Instance = this;
+
 
 MUAC::MUAC()
     : CPlugIn(COMPATIBILITY_CODE, PLUGIN_NAME.c_str(),
@@ -79,7 +81,7 @@ bool MUAC::OnCompileCommand(const char* sCommandLine)
     {
         if (!HoppieConnected)
         {
-            CPDLCSettingsDialog dlg;
+            CPDLCSettingsDialog dlg(nullptr);
             dlg.m_Logon = logonCallsign.c_str();
             dlg.m_Password = logonCode.c_str();
             dlg.m_Sound = PlaySoundClr ? 1 : 0;
