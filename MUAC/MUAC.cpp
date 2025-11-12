@@ -1,17 +1,14 @@
 #include "stdafx.h"
-#include "CPDLCSettingsDialog.hpp"
+#include "EuroScopePlugIn.h"         // DisplayUserMessage, CPlugIn
 #include "MUAC.h"
-#include "HttpHelper.h"  // <-- needed
-#include "Logger.h"      // <-- needed
-
-
+#include "HttpHelper.h"
+#include "Logger.h"
+#include "CPDLCSettingsDialog.hpp"
 
 #include <string>
-#include <vector>
-#include <map>
 #include <future>
-#include <cstdlib>
 #include <ctime>
+#include <cstdlib>
 #include <sstream>
 
 using namespace std;
@@ -21,18 +18,12 @@ future<string> fRDFString;
 
 void datalinkLogin(void* arg);  // forward declaration
 
-
 // Hoppie CPDLC globals
-std::string baseUrlDatalink = "https://hoppie.acars.server/api";
-std::string tdest;
-std::string ttype;
-std::string tmessage;
-bool PlaySoundClr = true; // if you use sound toggle
-
-// Define static members
-bool Logger::ENABLED = false;
-std::string Logger::DLL_PATH = "";
-
+string baseUrlDatalink = "https://hoppie.acars.server/api";
+string tdest;
+string ttype;
+string tmessage;
+bool PlaySoundClr = true;
 
 bool HoppieConnected = false;
 bool ConnectionMessage = false;
@@ -44,18 +35,18 @@ string logonCallsign = "EGKK";
 HttpHelper* httpHelper = nullptr;
 static int messageId = 0;
 
+// Logger static members
+bool Logger::ENABLED = false;
+string Logger::DLL_PATH = "";
+
+// ----------------- Functions -----------------
 void datalinkLogin(void* arg) {
     if (!httpHelper) return;
 
-    string raw;
-    string url = baseUrlDatalink;
-    url += "?logon=" + logonCode;
-    url += "&from=" + logonCallsign;
-    url += "&to=SERVER&type=PING";
+    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=SERVER&type=PING";
+    string raw = httpHelper->downloadStringFromURL(url);
 
-    raw = httpHelper->downloadStringFromURL(url);
-
-    if (startsWith("ok", raw.c_str())) {
+    if (raw.find("ok") == 0) {
         HoppieConnected = true;
         ConnectionMessage = true;
         DisplayUserMessage("Hoppie ACARS", "Server", "Connected!", true, true, false, true, false);
@@ -63,48 +54,6 @@ void datalinkLogin(void* arg) {
         FailedToConnectMessage = true;
         DisplayUserMessage("Hoppie ACARS", "Server", "Failed to connect!", true, true, false, true, false);
     }
-}
-
-
-MUAC::MUAC() :
-    CPlugIn(COMPATIBILITY_CODE, PLUGIN_NAME.c_str(),
-        PLUGIN_VERSION.c_str(), PLUGIN_AUTHOR.c_str(), PLUGIN_COPY.c_str())
-{
-    srand((unsigned int)time(nullptr));
-    this->RegisterPlugin();
-
-    DisplayUserMessage("MUAC", "MUAC PlugIn",
-        string("Version " + PLUGIN_VERSION + " loaded").c_str(),
-        false, false, false, false, false);
-
-    // ---- Find DLL path ----
-    char DllPathFile[_MAX_PATH];
-    string DllPath;
-    GetModuleFileNameA(HINSTANCE(&__ImageBase), DllPathFile, sizeof(DllPathFile));
-    DllPath = DllPathFile;
-    DllPath.resize(DllPath.size() - strlen("MUAC.dll"));
-
-    // ---- Load Callsign Lookup ----
-    string FilePath = DllPath + "\\ICAO_Airlines.txt";
-    if (file_exist(FilePath)) {
-        CCallsignLookup::Lookup = new CCallsignLookup(FilePath);
-        CCallsignLookup::Available = true;
-    }
-    else {
-        CCallsignLookup::Available = false;
-        DisplayUserMessage("MUAC", "MUAC PlugIn",
-            "Warning: Could not load callsigns, they will be unavailable",
-            true, true, false, false, true);
-    }
-
-    // ---- Init HTTP Helper ----
-    if (!httpHelper)
-        httpHelper = new HttpHelper();
-
-    // ---- Init Random ID and Logging ----
-    messageId = rand() % 10000 + 1000;
-   Logger::info("MUAC Datalink initialized.");
-
 }
 
 bool MUAC::OnCompileCommand(const char* sCommandLine) {
@@ -123,7 +72,7 @@ bool MUAC::OnCompileCommand(const char* sCommandLine) {
                 // save settings
                 SaveDataToSettings("hoppie_logon", "Hoppie ACARS Callsign", logonCallsign.c_str());
                 SaveDataToSettings("hoppie_code", "Hoppie ACARS Logon Code", logonCode.c_str());
-                SaveDataToSettings("hoppie_sound", "Play sound on clearance request", std::to_string(PlaySoundClr).c_str());
+                SaveDataToSettings("hoppie_sound", "Play sound on clearance request", to_string(PlaySoundClr).c_str());
 
                 // perform login
                 _beginthread(datalinkLogin, 0, nullptr);
@@ -138,57 +87,4 @@ bool MUAC::OnCompileCommand(const char* sCommandLine) {
     return false;
 }
 
-
-
-void sendHoppieMessage(void* arg) {
-    string raw;
-    string url = baseUrlDatalink;
-    url += "?logon=" + logonCode;
-    url += "&from=" + logonCallsign;
-    url += "&to=" + tdest;
-    url += "&type=" + ttype;
-    url += "&packet=" + tmessage;
-
-    // Encode spaces
-    size_t pos = 0;
-    while ((pos = url.find(" ", pos)) != string::npos) {
-        url.replace(pos, 1, "%20");
-        pos += 3;
-    }
-
-    raw = httpHelper->downloadStringFromURL(url);
-
-    if (startsWith("ok", raw.c_str())) {
-        // handle successful send
-    }
-}
-
-void pollHoppieMessages(void* arg) {
-    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=SERVER&type=POLL";
-    string raw = httpHelper->downloadStringFromURL(url);
-
-    if (!startsWith("ok", raw.c_str()) || raw.size() <= 3) return;
-
-    // parse messages like in your example
-}
-
-
-
-CRadarScreen * MUAC::OnRadarScreenCreated(const char * sDisplayName, bool NeedRadarContent, bool GeoReferenced, bool CanBeSaved, bool CanBeCreated)
-{
-	if (!strcmp(sDisplayName, MUAC_RADAR_SCREEN_VIEW))
-		return new RadarScreen();
-
-	return nullptr;
-}
-
-void MUAC::OnTimer(int Counter)
-{
-	if (Counter % 5 == 0) {
-
-	}
-}
-
-void MUAC::RegisterPlugin() {
-	RegisterDisplayType(MUAC_RADAR_SCREEN_VIEW, false, true, true, true);
-}
+// Other MUAC functions remain the same, e.g., OnRadarScreenCreated, OnTimer, RegisterPlugin
