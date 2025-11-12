@@ -38,6 +38,9 @@ void pollHoppieMessages();
 // ------------------------
 // MUAC class
 // ------------------------
+
+MUAC* MUAC::Instance = nullptr;
+
 MUAC::MUAC()
     : CPlugIn(COMPATIBILITY_CODE, PLUGIN_NAME.c_str(),
               PLUGIN_VERSION.c_str(), PLUGIN_AUTHOR.c_str(), PLUGIN_COPY.c_str())
@@ -156,19 +159,17 @@ void datalinkLogin()
         HoppieConnected = true;
         ConnectionMessage = true;
 
-        // Access DisplayUserMessage via plugin instance
-        MUAC* pluginInstance = reinterpret_cast<MUAC*>(CPlugIn::GetPluginInstance());
-        if (pluginInstance)
-            pluginInstance->DisplayUserMessage("Hoppie ACARS", "Server", "Connected!", true, true, false, true, false);
+        if (MUAC::Instance)
+            MUAC::Instance->DisplayUserMessage("Hoppie ACARS", "Server", "Connected!", true, true, false, true, false);
     }
     else
     {
         FailedToConnectMessage = true;
-        MUAC* pluginInstance = reinterpret_cast<MUAC*>(CPlugIn::GetPluginInstance());
-        if (pluginInstance)
-            pluginInstance->DisplayUserMessage("Hoppie ACARS", "Server", "Failed to connect!", true, true, false, true, false);
+        if (MUAC::Instance)
+            MUAC::Instance->DisplayUserMessage("Hoppie ACARS", "Server", "Failed to connect!", true, true, false, true, false);
     }
 }
+
 
 // ------------------------
 // Send Hoppie message
