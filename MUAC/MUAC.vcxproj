@@ -189,6 +189,7 @@
     </ClCompile>
     <ClCompile Include="HttpHelper.cpp" />
     <ClCompile Include="MUAC.cpp" />
+    <ClCompile Include="Logger.cpp"  />
     <ClCompile Include="RadarScreen.cpp" />
     <ClCompile Include="STCA.cpp" />
     <ClCompile Include="stdafx.cpp">
