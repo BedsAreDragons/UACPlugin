@@ -40,14 +40,15 @@ void pollHoppieMessages();
 // ------------------------
 
 MUAC* MUAC::Instance = nullptr;
-MUAC::Instance = this;
+
 
 
 MUAC::MUAC()
     : CPlugIn(COMPATIBILITY_CODE, PLUGIN_NAME.c_str(),
               PLUGIN_VERSION.c_str(), PLUGIN_AUTHOR.c_str(), PLUGIN_COPY.c_str())
 {
-    srand(static_cast<unsigned int>(time(nullptr)));
+    MUAC::Instance = this;
+	srand(static_cast<unsigned int>(time(nullptr)));
     RegisterPlugin();
 
     DisplayUserMessage("MUAC", "MUAC PlugIn",
