@@ -79,7 +79,7 @@ bool MUAC::OnCompileCommand(const char* sCommandLine)
     {
         if (!HoppieConnected)
         {
-            CCPDLCSettingsDialog dlg;
+            CPDLCSettingsDialog dlg;
             dlg.m_Logon = logonCallsign.c_str();
             dlg.m_Password = logonCode.c_str();
             dlg.m_Sound = PlaySoundClr ? 1 : 0;
