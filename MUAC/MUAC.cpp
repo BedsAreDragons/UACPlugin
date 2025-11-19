@@ -25,7 +25,7 @@ bool PlaySoundClr = true;
 string logonCallsign = "EGKK";
 string logonCode = "";
 
-string baseUrlDatalink = "https://hoppie.acars.server/api";
+string baseUrlDatalink = "http://www.hoppie.nl/acars/system/connect.html";
 string tdest, ttype, tmessage;
 static int messageId = 0;
 
