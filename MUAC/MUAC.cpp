@@ -30,10 +30,42 @@ string tdest, ttype, tmessage;
 static int messageId = 0;
 
 // Forward declarations
-void sendHoppieMessage();
+void sendHoppieMessage()
+{
+    if (!httpHelper) return;
 
-void __cdecl datalinkLogin(void* arg);
-void __cdecl pollHoppieMessages(void* arg);
+    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=" + tdest + "&type=" + ttype + "&packet=" + tmessage;
+
+    size_t pos = 0;
+    while ((pos = url.find(" ", pos)) != string::npos)
+    {
+        url.replace(pos, 1, "%20");
+        pos += 3;
+    }
+
+    string raw = httpHelper->downloadStringFromURL(url);
+
+    if (raw.find("ok") == 0)
+    {
+        // Successfully sent
+    }
+}
+
+// ------------------------
+// Poll messages from Hoppie
+// ------------------------
+void pollHoppieMessages()
+{
+    if (!httpHelper) return;
+
+    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=SERVER&type=POLL";
+    string raw = httpHelper->downloadStringFromURL(url);
+
+    if (raw.find("ok") != 0 || raw.size() <= 3) return;
+
+    // TODO: parse messages from raw string
+}
+
 
 
 // ------------------------
@@ -192,38 +224,3 @@ void datalinkLogin()
 // ------------------------
 // Send Hoppie message
 // ------------------------
-void sendHoppieMessage()
-{
-    if (!httpHelper) return;
-
-    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=" + tdest + "&type=" + ttype + "&packet=" + tmessage;
-
-    size_t pos = 0;
-    while ((pos = url.find(" ", pos)) != string::npos)
-    {
-        url.replace(pos, 1, "%20");
-        pos += 3;
-    }
-
-    string raw = httpHelper->downloadStringFromURL(url);
-
-    if (raw.find("ok") == 0)
-    {
-        // Successfully sent
-    }
-}
-
-// ------------------------
-// Poll messages from Hoppie
-// ------------------------
-void pollHoppieMessages()
-{
-    if (!httpHelper) return;
-
-    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=SERVER&type=POLL";
-    string raw = httpHelper->downloadStringFromURL(url);
-
-    if (raw.find("ok") != 0 || raw.size() <= 3) return;
-
-    // TODO: parse messages from raw string
-}
