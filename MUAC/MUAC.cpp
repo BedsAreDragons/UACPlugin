@@ -129,6 +129,78 @@ bool MUAC::OnCompileCommand(const char * sCommandLine) {
 }
 
 
+void pollMessages(void * arg) {
+	string raw = "";
+	string url = baseUrlDatalink;
+	url += "?logon=";
+	url += logonCode;
+	url += "&from=";
+	url += logonCallsign;
+	url += "&to=SERVER&type=POLL";
+	raw.assign(httpHelper->downloadStringFromURL(url));
+
+	if (!startsWith("ok", raw.c_str()) || raw.size() <= 3)
+		return;
+
+	raw = raw + " ";
+	raw = raw.substr(3, raw.size() - 3);
+
+	string delimiter = "}} ";
+	size_t pos = 0;
+	std::string token;
+	while ((pos = raw.find(delimiter)) != std::string::npos) {
+		token = raw.substr(1, pos);
+
+		string parsed;
+		stringstream input_stringstream(token);
+		struct AcarsMessage message;
+		int i = 1;
+		while (getline(input_stringstream, parsed, ' '))
+		{
+			if (i == 1)
+				message.from = parsed;
+			if (i == 2)
+				message.type = parsed;
+			if (i > 2)
+			{
+				message.message.append(" ");
+				message.message.append(parsed);
+			}
+
+			i++;
+		}
+		if (message.type.find("telex") != std::string::npos || message.type.find("cpdlc") != std::string::npos) {
+			if (message.message.find("REQ") != std::string::npos || message.message.find("CLR") != std::string::npos || message.message.find("PDC") != std::string::npos || message.message.find("PREDEP") != std::string::npos || message.message.find("REQUEST") != std::string::npos) {
+				if (message.message.find("LOGON") != std::string::npos) {
+					tmessage = "UNABLE";
+					ttype = "CPDLC";
+					tdest = DatalinkToSend.callsign;
+					_beginthread(sendDatalinkMessage, 0, NULL);
+				} else {
+					if (PlaySoundClr) {
+						AFX_MANAGE_STATE(AfxGetStaticModuleState());
+						PlaySound(MAKEINTRESOURCE(IDR_WAVE1), AfxGetInstanceHandle(), SND_RESOURCE | SND_ASYNC);
+					}
+					AircraftDemandingClearance.push_back(message.from);
+				}
+			}
+			else if (message.message.find("WILCO") != std::string::npos || message.message.find("ROGER") != std::string::npos || message.message.find("RGR") != std::string::npos) {
+				if (std::find(AircraftMessageSent.begin(), AircraftMessageSent.end(), message.from) != AircraftMessageSent.end()) {
+					AircraftWilco.push_back(message.from);
+				}
+			}
+			else if (message.message.length() != 0 ){
+				AircraftMessage.push_back(message.from);
+			}
+			PendingMessages[message.from] = message;
+		}
+
+		raw.erase(0, pos + delimiter.length());
+	}
+
+
+};
+
 // ------------------------
 // Radar screen creation
 // ------------------------
