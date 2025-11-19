@@ -25,73 +25,14 @@ bool PlaySoundClr = true;
 string logonCallsign = "EGKK";
 string logonCode = "";
 
-string baseUrlDatalink = "http://www.hoppie.nl/acars/system/connect.html";
+string baseUrlDatalink = "https://hoppie.acars.server/api";
 string tdest, ttype, tmessage;
 static int messageId = 0;
 
 // Forward declarations
-void sendHoppieMessage()
-{
-    if (!httpHelper) return;
-
-    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=" + tdest + "&type=" + ttype + "&packet=" + tmessage;
-
-    size_t pos = 0;
-    while ((pos = url.find(" ", pos)) != string::npos)
-    {
-        url.replace(pos, 1, "%20");
-        pos += 3;
-    }
-
-    string raw = httpHelper->downloadStringFromURL(url);
-
-    if (raw.find("ok") == 0)
-    {
-        // Successfully sent
-    }
-}
-
-// ------------------------
-// Poll messages from Hoppie
-// ------------------------
-void __cdecl pollHoppieMessages(void* arg)
-{
-	(void)arg; // unused parameter
-    if (!httpHelper) return;
-
-    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=SERVER&type=POLL";
-    string raw = httpHelper->downloadStringFromURL(url);
-
-    if (raw.find("ok") != 0 || raw.size() <= 3) return;
-
-    // TODO: parse messages from raw string
-}
-
-
-void __cdecl datalinkLogin(void* arg)
-{
-	(void)arg; // unused parameter
-    if (!httpHelper) return;
-
-    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=SERVER&type=PING";
-    string raw = httpHelper->downloadStringFromURL(url);
-
-    if (raw.find("ok") == 0)
-    {
-        HoppieConnected = true;
-        ConnectionMessage = true;
-
-        if (MUAC::Instance)
-            MUAC::Instance->DisplayUserMessage("Hoppie ACARS", "Server", "Connected!", true, true, false, true, false);
-    }
-    else
-    {
-        FailedToConnectMessage = true;
-        if (MUAC::Instance)
-            MUAC::Instance->DisplayUserMessage("Hoppie ACARS", "Server", "Failed to connect!", true, true, false, true, false);
-    }
-}
-
+void datalinkLogin();
+void sendHoppieMessage();
+void pollHoppieMessages();
 
 // ------------------------
 // MUAC class
@@ -133,60 +74,45 @@ MUAC::~MUAC()
 // ------------------------
 // Plugin commands
 // ------------------------
-bool MUAC::OnCompileCommand(const char * sCommandLine) {
-	if (startsWith(".uac connect", sCommandLine))
-	{
-		if (ControllerMyself().IsController()) {
-			if (!HoppieConnected) {
-				_beginthread(datalinkLogin, 0, NULL);
-			}
-			else {
-				HoppieConnected = false;
-				DisplayUserMessage("CPDLC", "Server", "Logged off!", true, true, false, true, false);
-			}
-		}
-		else {
-			DisplayUserMessage("CPDLC", "Error", "You are not logged in as a controller!", true, true, false, true, false);
-		}
+bool MUAC::OnCompileCommand(const char* sCommandLine)
+{
+    if (strncmp(".hoppie connect", sCommandLine, 15) == 0)
+    {
+        if (!HoppieConnected)
+        {
+            // <-- create the dialog correctly
+            CPDLCSettingsDialog dlg(nullptr);  
+            dlg.m_Logon = logonCallsign.c_str();
+            dlg.m_Password = logonCode.c_str();
+            dlg.m_Sound = PlaySoundClr ? 1 : 0;
 
-		return true;
-	}
-	else if (startsWith(".uac poll", sCommandLine))
-	{
-		if (HoppieConnected) {
-			_beginthread(pollHoppieMessages, 0, NULL);
-		}
-		return true;
-	}
-	else if (strcmp(sCommandLine, ".uac log") == 0) {
-		Logger::ENABLED = !Logger::ENABLED;
-		return true;
-	}
-	else if (startsWith(".uac", sCommandLine))
-	{
-		CPDLCSettingsDialog dia;
-		dia.m_Logon = logonCallsign.c_str();
-		dia.m_Password = logonCode.c_str();
-		dia.m_Sound = int(PlaySoundClr);
+            if (dlg.DoModal() == IDOK)
+            {
+                logonCallsign = dlg.m_Logon;
+                logonCode = dlg.m_Password;
+                PlaySoundClr = dlg.m_Sound != 0;
 
-		if (dia.DoModal() != IDOK)
-			return true;
+                // Save settings
+                SaveDataToSettings("hoppie_logon", "Hoppie ACARS Callsign", logonCallsign.c_str());
+                SaveDataToSettings("hoppie_code", "Hoppie ACARS Logon Code", logonCode.c_str());
+                SaveDataToSettings("hoppie_sound", "Play sound on clearance request", to_string(PlaySoundClr).c_str());
 
-		logonCallsign = dia.m_Logon;
-		logonCode = dia.m_Password;
-		PlaySoundClr = bool(!!dia.m_Sound);
-		SaveDataToSettings("cpdlc_logon", "The CPDLC logon callsign", logonCallsign.c_str());
-		SaveDataToSettings("cpdlc_password", "The CPDLC logon password", logonCode.c_str());
-		int temp = 0;
-		if (PlaySoundClr)
-			temp = 1;
-		SaveDataToSettings("cpdlc_sound", "Play sound on clearance request", std::to_string(temp).c_str());
+                // Start login thread
+                thread loginThread(datalinkLogin);
+                loginThread.detach();
+            }
+        }
+        else
+        {
+            HoppieConnected = false;
+            DisplayUserMessage("Hoppie ACARS", "Server", "Logged off!", true, true, false, true, false);
+        }
 
-		return true;
-	}
-	return false;
+        return true;
+    }
+
+    return false;
 }
-
 
 // ------------------------
 // Radar screen creation
@@ -220,3 +146,67 @@ void MUAC::RegisterPlugin()
     RegisterDisplayType(MUAC_RADAR_SCREEN_VIEW, false, true, true, true);
 }
 
+// ------------------------
+// Hoppie datalink login
+// ------------------------
+void datalinkLogin()
+{
+    if (!httpHelper) return;
+
+    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=SERVER&type=PING";
+    string raw = httpHelper->downloadStringFromURL(url);
+
+    if (raw.find("ok") == 0)
+    {
+        HoppieConnected = true;
+        ConnectionMessage = true;
+
+        if (MUAC::Instance)
+            MUAC::Instance->DisplayUserMessage("Hoppie ACARS", "Server", "Connected!", true, true, false, true, false);
+    }
+    else
+    {
+        FailedToConnectMessage = true;
+        if (MUAC::Instance)
+            MUAC::Instance->DisplayUserMessage("Hoppie ACARS", "Server", "Failed to connect!", true, true, false, true, false);
+    }
+}
+
+// ------------------------
+// Send Hoppie message
+// ------------------------
+void sendHoppieMessage()
+{
+    if (!httpHelper) return;
+
+    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=" + tdest + "&type=" + ttype + "&packet=" + tmessage;
+
+    size_t pos = 0;
+    while ((pos = url.find(" ", pos)) != string::npos)
+    {
+        url.replace(pos, 1, "%20");
+        pos += 3;
+    }
+
+    string raw = httpHelper->downloadStringFromURL(url);
+
+    if (raw.find("ok") == 0)
+    {
+        // Successfully sent
+    }
+}
+
+// ------------------------
+// Poll messages from Hoppie
+// ------------------------
+void pollHoppieMessages()
+{
+    if (!httpHelper) return;
+
+    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=SERVER&type=POLL";
+    string raw = httpHelper->downloadStringFromURL(url);
+
+    if (raw.find("ok") != 0 || raw.size() <= 3) return;
+
+    // TODO: parse messages from raw string
+}
