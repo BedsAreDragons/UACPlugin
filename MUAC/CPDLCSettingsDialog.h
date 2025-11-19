@@ -1,10 +1,6 @@
 #pragma once
 
 #include "resource.h"
-#include <afxwin.h>
-#include <afxdialogex.h>
-
-
 
 // CPDLCSettingsDialog dialog
 
