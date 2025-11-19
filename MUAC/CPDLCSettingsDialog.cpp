@@ -8,12 +8,12 @@
 
 
 
-// CCPDLCSettingsDialog dialog
+// CPDLCSettingsDialog dialog
+IMPLEMENT_DYNAMIC(CPDLCSettingsDialog, CDialogEx)
 
-IMPLEMENT_DYNAMIC(CCPDLCSettingsDialog, CDialogEx)
 
-CCPDLCSettingsDialog::CCPDLCSettingsDialog(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CCPDLCSettingsDialog::IDD, pParent)
+CPDLCSettingsDialog::CPDLCSettingsDialog(CWnd* pParent /*=NULL*/)
+	: CDialogEx(CPDLCSettingsDialog::IDD, pParent)
 	, m_Logon(_T("EGKK"))
 	, m_Password(_T("PASSWORD"))
 	, m_Sound(1)
@@ -21,11 +21,11 @@ CCPDLCSettingsDialog::CCPDLCSettingsDialog(CWnd* pParent /*=NULL*/)
 
 }
 
-CCPDLCSettingsDialog::~CCPDLCSettingsDialog()
+CPDLCSettingsDialog::~CPDLCSettingsDialog()
 {
 }
 
-void CCPDLCSettingsDialog::DoDataExchange(CDataExchange* pDX)
+void CPDLCSettingsDialog::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_LOGON, m_Logon);
@@ -34,11 +34,11 @@ void CCPDLCSettingsDialog::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CCPDLCSettingsDialog, CDialogEx)
-	ON_BN_CLICKED(IDOK, &CCPDLCSettingsDialog::OnBnClickedOk)
+BEGIN_MESSAGE_MAP(CPDLCSettingsDialog, CDialogEx)
+	ON_BN_CLICKED(IDOK, &CPDLCSettingsDialog::OnBnClickedOk)
 END_MESSAGE_MAP()
 
-void CCPDLCSettingsDialog::OnBnClickedOk()
+void CPDLCSettingsDialog::OnBnClickedOk()
 {
 	// TODO: Add your control notification handler code here
 	CDialogEx::OnOK();
