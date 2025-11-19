@@ -74,45 +74,60 @@ MUAC::~MUAC()
 // ------------------------
 // Plugin commands
 // ------------------------
-bool MUAC::OnCompileCommand(const char* sCommandLine)
-{
-    if (strncmp(".hoppie connect", sCommandLine, 15) == 0)
-    {
-        if (!HoppieConnected)
-        {
-            // <-- create the dialog correctly
-            CPDLCSettingsDialog dlg(nullptr);  
-            dlg.m_Logon = logonCallsign.c_str();
-            dlg.m_Password = logonCode.c_str();
-            dlg.m_Sound = PlaySoundClr ? 1 : 0;
+bool MUAC::OnCompileCommand(const char * sCommandLine) {
+	if (startsWith(".uac connect", sCommandLine))
+	{
+		if (ControllerMyself().IsController()) {
+			if (!HoppieConnected) {
+				_beginthread(datalinkLogin, 0, NULL);
+			}
+			else {
+				HoppieConnected = false;
+				DisplayUserMessage("CPDLC", "Server", "Logged off!", true, true, false, true, false);
+			}
+		}
+		else {
+			DisplayUserMessage("CPDLC", "Error", "You are not logged in as a controller!", true, true, false, true, false);
+		}
 
-            if (dlg.DoModal() == IDOK)
-            {
-                logonCallsign = dlg.m_Logon;
-                logonCode = dlg.m_Password;
-                PlaySoundClr = dlg.m_Sound != 0;
+		return true;
+	}
+	else if (startsWith(".uac poll", sCommandLine))
+	{
+		if (HoppieConnected) {
+			_beginthread(pollMessages, 0, NULL);
+		}
+		return true;
+	}
+	else if (strcmp(sCommandLine, ".uac log") == 0) {
+		Logger::ENABLED = !Logger::ENABLED;
+		return true;
+	}
+	else if (startsWith(".uac", sCommandLine))
+	{
+		CPDLCSettingsDialog dia;
+		dia.m_Logon = logonCallsign.c_str();
+		dia.m_Password = logonCode.c_str();
+		dia.m_Sound = int(PlaySoundClr);
 
-                // Save settings
-                SaveDataToSettings("hoppie_logon", "Hoppie ACARS Callsign", logonCallsign.c_str());
-                SaveDataToSettings("hoppie_code", "Hoppie ACARS Logon Code", logonCode.c_str());
-                SaveDataToSettings("hoppie_sound", "Play sound on clearance request", to_string(PlaySoundClr).c_str());
+		if (dia.DoModal() != IDOK)
+			return true;
 
-                // Start login thread
-                thread loginThread(datalinkLogin);
-                loginThread.detach();
-            }
-        }
-        else
-        {
-            HoppieConnected = false;
-            DisplayUserMessage("Hoppie ACARS", "Server", "Logged off!", true, true, false, true, false);
-        }
+		logonCallsign = dia.m_Logon;
+		logonCode = dia.m_Password;
+		PlaySoundClr = bool(!!dia.m_Sound);
+		SaveDataToSettings("cpdlc_logon", "The CPDLC logon callsign", logonCallsign.c_str());
+		SaveDataToSettings("cpdlc_password", "The CPDLC logon password", logonCode.c_str());
+		int temp = 0;
+		if (PlaySoundClr)
+			temp = 1;
+		SaveDataToSettings("cpdlc_sound", "Play sound on clearance request", std::to_string(temp).c_str());
 
-        return true;
-    }
-
-    return false;
+		return true;
+	}
+	return false;
 }
+
 
 // ------------------------
 // Radar screen creation
