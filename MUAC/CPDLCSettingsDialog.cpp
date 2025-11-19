@@ -2,13 +2,15 @@
 //
 
 #include "stdafx.h"
-#include "CPDLCSettingsDialog.hpp"
+#include "CPDLCSettingsDialog.h"
 #include "afxdialogex.h"
 
 
-// CPDLCSettingsDialog dialog
 
+
+// CPDLCSettingsDialog dialog
 IMPLEMENT_DYNAMIC(CPDLCSettingsDialog, CDialogEx)
+
 
 CPDLCSettingsDialog::CPDLCSettingsDialog(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CPDLCSettingsDialog::IDD, pParent)
