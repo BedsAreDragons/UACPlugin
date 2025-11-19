@@ -63,6 +63,9 @@
     <ClInclude Include="AntiOverlap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CPDLCSettingsDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="MTCD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
