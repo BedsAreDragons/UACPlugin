@@ -30,9 +30,9 @@ string tdest, ttype, tmessage;
 static int messageId = 0;
 
 // Forward declarations
-void datalinkLogin();
-void sendHoppieMessage();
-void pollHoppieMessages();
+void datalinkLogin(void * arg);
+void sendHoppieMessage(void * arg);
+void pollHoppieMessages(void * arg);
 
 // ------------------------
 // MUAC class
