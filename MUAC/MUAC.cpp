@@ -67,6 +67,29 @@ void pollHoppieMessages()
 }
 
 
+void datalinkLogin()
+{
+    if (!httpHelper) return;
+
+    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=SERVER&type=PING";
+    string raw = httpHelper->downloadStringFromURL(url);
+
+    if (raw.find("ok") == 0)
+    {
+        HoppieConnected = true;
+        ConnectionMessage = true;
+
+        if (MUAC::Instance)
+            MUAC::Instance->DisplayUserMessage("Hoppie ACARS", "Server", "Connected!", true, true, false, true, false);
+    }
+    else
+    {
+        FailedToConnectMessage = true;
+        if (MUAC::Instance)
+            MUAC::Instance->DisplayUserMessage("Hoppie ACARS", "Server", "Failed to connect!", true, true, false, true, false);
+    }
+}
+
 
 // ------------------------
 // MUAC class
@@ -195,32 +218,3 @@ void MUAC::RegisterPlugin()
     RegisterDisplayType(MUAC_RADAR_SCREEN_VIEW, false, true, true, true);
 }
 
-// ------------------------
-// Hoppie datalink login
-// ------------------------
-void datalinkLogin()
-{
-    if (!httpHelper) return;
-
-    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=SERVER&type=PING";
-    string raw = httpHelper->downloadStringFromURL(url);
-
-    if (raw.find("ok") == 0)
-    {
-        HoppieConnected = true;
-        ConnectionMessage = true;
-
-        if (MUAC::Instance)
-            MUAC::Instance->DisplayUserMessage("Hoppie ACARS", "Server", "Connected!", true, true, false, true, false);
-    }
-    else
-    {
-        FailedToConnectMessage = true;
-        if (MUAC::Instance)
-            MUAC::Instance->DisplayUserMessage("Hoppie ACARS", "Server", "Failed to connect!", true, true, false, true, false);
-    }
-}
-
-// ------------------------
-// Send Hoppie message
-// ------------------------
