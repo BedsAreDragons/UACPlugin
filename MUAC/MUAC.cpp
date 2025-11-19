@@ -54,8 +54,9 @@ void sendHoppieMessage()
 // ------------------------
 // Poll messages from Hoppie
 // ------------------------
-void pollHoppieMessages()
+void __cdecl pollHoppieMessages(void* arg)
 {
+	(void)arg; // unused parameter
     if (!httpHelper) return;
 
     string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=SERVER&type=POLL";
@@ -67,8 +68,9 @@ void pollHoppieMessages()
 }
 
 
-void datalinkLogin()
+void __cdecl datalinkLogin(void* arg)
 {
+	(void)arg; // unused parameter
     if (!httpHelper) return;
 
     string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=SERVER&type=PING";
