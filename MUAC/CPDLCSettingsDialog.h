@@ -1,24 +1,20 @@
 #pragma once
 
 #include "resource.h"
-#ifndef __AFXWIN_H__
-#include <afxwin.h>      // CWnd, CDialogEx
-#endif
-
-#ifndef __AFXDLGS_H__
-#include <afxdialogex.h> // CDialogEx
-#endif
+#include <afxwin.h>
+#include <afxdialogex.h>
 
 
-// CCPDLCSettingsDialog dialog
 
-class CCPDLCSettingsDialog : public CDialogEx
+// CPDLCSettingsDialog dialog
+
+class CPDLCSettingsDialog : public CDialogEx
 {
-	DECLARE_DYNAMIC(CCPDLCSettingsDialog)
+	DECLARE_DYNAMIC(CPDLCSettingsDialog)
 
 public:
-	CCPDLCSettingsDialog(CWnd* pParent = NULL);   // standard constructor
-	virtual ~CCPDLCSettingsDialog();
+	CPDLCSettingsDialog(CWnd* pParent = NULL);   // standard constructor
+	virtual ~CPDLCSettingsDialog();
 
 	CString m_Logon;
 	CString m_Password;
