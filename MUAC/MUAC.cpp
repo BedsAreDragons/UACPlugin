@@ -147,8 +147,9 @@ void MUAC::OnTimer(int Counter)
     if (Counter % 5 == 0)
     {
         // Periodically poll Hoppie server
-        thread pollThread(pollHoppieMessages);
-        pollThread.detach();
+        thread pollThread([]() { pollHoppieMessages(nullptr); });
+		pollThread.detach();
+
     }
 }
 
