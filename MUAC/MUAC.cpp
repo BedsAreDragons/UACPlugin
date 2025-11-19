@@ -105,7 +105,7 @@ bool MUAC::OnCompileCommand(const char * sCommandLine) {
 	}
 	else if (startsWith(".uac", sCommandLine))
 	{
-		CCPDLCSettingsDialog dia;
+		CPDLCSettingsDialog dia;
 		dia.m_Logon = logonCallsign.c_str();
 		dia.m_Password = logonCode.c_str();
 		dia.m_Sound = int(PlaySoundClr);
