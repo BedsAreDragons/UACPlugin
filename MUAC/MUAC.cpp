@@ -10,6 +10,8 @@
 #include <cstdlib>
 #include <thread>
 #include <future>
+#include <sstream>
+#include <algorithm>
 
 using namespace std;
 
@@ -33,6 +35,8 @@ static int messageId = 0;
 void datalinkLogin();
 void sendHoppieMessage();
 void pollHoppieMessages();
+void pollMessages(void* arg);
+void sendDatalinkMessage(void* arg);
 
 // ------------------------
 // MUAC class
@@ -44,7 +48,7 @@ MUAC::MUAC()
     : CPlugIn(COMPATIBILITY_CODE, PLUGIN_NAME.c_str(),
               PLUGIN_VERSION.c_str(), PLUGIN_AUTHOR.c_str(), PLUGIN_COPY.c_str())
 {
-    MUAC::Instance = this;  // <-- assign inside constructor
+    MUAC::Instance = this;
 
     srand(static_cast<unsigned int>(time(nullptr)));
     RegisterPlugin();
@@ -56,7 +60,6 @@ MUAC::MUAC()
     if (!httpHelper)
         httpHelper = new HttpHelper();
 
-    // Initialize random message ID
     messageId = rand() % 10000 + 1000;
 
     Logger::info("MUAC Datalink initialized.");
@@ -74,132 +77,128 @@ MUAC::~MUAC()
 // ------------------------
 // Plugin commands
 // ------------------------
-bool MUAC::OnCompileCommand(const char * sCommandLine) {
-	if (startsWith(".uac connect", sCommandLine))
-	{
-		if (ControllerMyself().IsController()) {
-			if (!HoppieConnected) {
-				_beginthread(datalinkLogin, 0, NULL);
-			}
-			else {
-				HoppieConnected = false;
-				DisplayUserMessage("CPDLC", "Server", "Logged off!", true, true, false, true, false);
-			}
-		}
-		else {
-			DisplayUserMessage("CPDLC", "Error", "You are not logged in as a controller!", true, true, false, true, false);
-		}
+bool MUAC::OnCompileCommand(const char* sCommandLine)
+{
+    if (startsWith(".uac connect", sCommandLine))
+    {
+        if (ControllerMyself().IsController()) {
+            if (!HoppieConnected) {
+                _beginthread(datalinkLogin, 0, NULL);
+            }
+            else {
+                HoppieConnected = false;
+                DisplayUserMessage("CPDLC", "Server", "Logged off!", true, true, false, true, false);
+            }
+        }
+        else {
+            DisplayUserMessage("CPDLC", "Error", "You are not logged in as a controller!", true, true, false, true, false);
+        }
+        return true;
+    }
+    else if (startsWith(".uac poll", sCommandLine))
+    {
+        if (HoppieConnected) {
+            _beginthread(pollHoppieMessages, 0, NULL);
+        }
+        else {
+            DisplayUserMessage("CPDLC", "Server", "Not connected to Hoppie!", true, true, false, true, false);
+        }
+        return true;
+    }
+    else if (strcmp(sCommandLine, ".uac log") == 0) {
+        Logger::ENABLED = !Logger::ENABLED;
+        DisplayUserMessage("CPDLC", "Logging", Logger::ENABLED ? "Enabled" : "Disabled", true, true, false, true, false);
+        return true;
+    }
+    else if (startsWith(".uac", sCommandLine))
+    {
+        CPDLCSettingsDialog dia;
+        dia.m_Logon = logonCallsign.c_str();
+        dia.m_Password = logonCode.c_str();
+        dia.m_Sound = int(PlaySoundClr);
 
-		return true;
-	}
-	else if (startsWith(".uac poll", sCommandLine))
-	{
-		if (HoppieConnected) {
-			_beginthread(pollMessages, 0, NULL);
-		}
-		return true;
-	}
-	else if (strcmp(sCommandLine, ".uac log") == 0) {
-		Logger::ENABLED = !Logger::ENABLED;
-		return true;
-	}
-	else if (startsWith(".uac", sCommandLine))
-	{
-		CPDLCSettingsDialog dia;
-		dia.m_Logon = logonCallsign.c_str();
-		dia.m_Password = logonCode.c_str();
-		dia.m_Sound = int(PlaySoundClr);
+        if (dia.DoModal() != IDOK)
+            return true;
 
-		if (dia.DoModal() != IDOK)
-			return true;
+        logonCallsign = dia.m_Logon;
+        logonCode = dia.m_Password;
+        PlaySoundClr = bool(!!dia.m_Sound);
 
-		logonCallsign = dia.m_Logon;
-		logonCode = dia.m_Password;
-		PlaySoundClr = bool(!!dia.m_Sound);
-		SaveDataToSettings("cpdlc_logon", "The CPDLC logon callsign", logonCallsign.c_str());
-		SaveDataToSettings("cpdlc_password", "The CPDLC logon password", logonCode.c_str());
-		int temp = 0;
-		if (PlaySoundClr)
-			temp = 1;
-		SaveDataToSettings("cpdlc_sound", "Play sound on clearance request", std::to_string(temp).c_str());
+        SaveDataToSettings("cpdlc_logon", "The CPDLC logon callsign", logonCallsign.c_str());
+        SaveDataToSettings("cpdlc_password", "The CPDLC logon password", logonCode.c_str());
+        SaveDataToSettings("cpdlc_sound", "Play sound on clearance request", PlaySoundClr ? "1" : "0");
 
-		return true;
-	}
-	return false;
+        DisplayUserMessage("CPDLC", "Settings", "Saved!", true, true, false, true, false);
+        return true;
+    }
+    return false;
 }
 
+// ------------------------
+// Poll Hoppie messages
+// ------------------------
+void pollHoppieMessages()
+{
+    if (!httpHelper) return;
 
-void pollMessages(void * arg) {
-	string raw = "";
-	string url = baseUrlDatalink;
-	url += "?logon=";
-	url += logonCode;
-	url += "&from=";
-	url += logonCallsign;
-	url += "&to=SERVER&type=POLL";
-	raw.assign(httpHelper->downloadStringFromURL(url));
+    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=SERVER&type=POLL";
+    string raw = httpHelper->downloadStringFromURL(url);
 
-	if (!startsWith("ok", raw.c_str()) || raw.size() <= 3)
-		return;
+    if (raw.find("ok") != 0 || raw.size() <= 3) return;
 
-	raw = raw + " ";
-	raw = raw.substr(3, raw.size() - 3);
+    raw = raw.substr(2); // remove "ok"
 
-	string delimiter = "}} ";
-	size_t pos = 0;
-	std::string token;
-	while ((pos = raw.find(delimiter)) != std::string::npos) {
-		token = raw.substr(1, pos);
+    string delimiter = "}} ";
+    size_t pos = 0;
+    string token;
+    while ((pos = raw.find(delimiter)) != string::npos) {
+        token = raw.substr(1, pos);
 
-		string parsed;
-		stringstream input_stringstream(token);
-		struct AcarsMessage message;
-		int i = 1;
-		while (getline(input_stringstream, parsed, ' '))
-		{
-			if (i == 1)
-				message.from = parsed;
-			if (i == 2)
-				message.type = parsed;
-			if (i > 2)
-			{
-				message.message.append(" ");
-				message.message.append(parsed);
-			}
+        stringstream input_stringstream(token);
+        struct AcarsMessage message;
+        string parsed;
+        int i = 1;
+        while (getline(input_stringstream, parsed, ' ')) {
+            if (i == 1) message.from = parsed;
+            else if (i == 2) message.type = parsed;
+            else message.message += " " + parsed;
+            i++;
+        }
 
-			i++;
-		}
-		if (message.type.find("telex") != std::string::npos || message.type.find("cpdlc") != std::string::npos) {
-			if (message.message.find("REQ") != std::string::npos || message.message.find("CLR") != std::string::npos || message.message.find("PDC") != std::string::npos || message.message.find("PREDEP") != std::string::npos || message.message.find("REQUEST") != std::string::npos) {
-				if (message.message.find("LOGON") != std::string::npos) {
-					tmessage = "UNABLE";
-					ttype = "CPDLC";
-					tdest = DatalinkToSend.callsign;
-					_beginthread(sendDatalinkMessage, 0, NULL);
-				} else {
-					if (PlaySoundClr) {
-						AFX_MANAGE_STATE(AfxGetStaticModuleState());
-						PlaySound(MAKEINTRESOURCE(IDR_WAVE1), AfxGetInstanceHandle(), SND_RESOURCE | SND_ASYNC);
-					}
-					AircraftDemandingClearance.push_back(message.from);
-				}
-			}
-			else if (message.message.find("WILCO") != std::string::npos || message.message.find("ROGER") != std::string::npos || message.message.find("RGR") != std::string::npos) {
-				if (std::find(AircraftMessageSent.begin(), AircraftMessageSent.end(), message.from) != AircraftMessageSent.end()) {
-					AircraftWilco.push_back(message.from);
-				}
-			}
-			else if (message.message.length() != 0 ){
-				AircraftMessage.push_back(message.from);
-			}
-			PendingMessages[message.from] = message;
-		}
+        if (message.type.find("telex") != string::npos || message.type.find("cpdlc") != string::npos) {
+            if (message.message.find("REQ") != string::npos || message.message.find("CLR") != string::npos ||
+                message.message.find("PDC") != string::npos || message.message.find("PREDEP") != string::npos ||
+                message.message.find("REQUEST") != string::npos) {
 
-		raw.erase(0, pos + delimiter.length());
-	}
+                if (message.message.find("LOGON") != string::npos) {
+                    tmessage = "UNABLE";
+                    ttype = "CPDLC";
+                    tdest = DatalinkToSend.callsign;
+                    _beginthread(sendDatalinkMessage, 0, NULL);
+                } else {
+                    if (PlaySoundClr) {
+                        AFX_MANAGE_STATE(AfxGetStaticModuleState());
+                        PlaySound(MAKEINTRESOURCE(IDR_WAVE1), AfxGetInstanceHandle(), SND_RESOURCE | SND_ASYNC);
+                    }
+                    AircraftDemandingClearance.push_back(message.from);
+                }
+            }
+            else if (message.message.find("WILCO") != string::npos ||
+                     message.message.find("ROGER") != string::npos ||
+                     message.message.find("RGR") != string::npos) {
+                if (std::find(AircraftMessageSent.begin(), AircraftMessageSent.end(), message.from) != AircraftMessageSent.end()) {
+                    AircraftWilco.push_back(message.from);
+                }
+            }
+            else if (!message.message.empty()) {
+                AircraftMessage.push_back(message.from);
+            }
+            PendingMessages[message.from] = message;
+        }
 
-
-};
+        raw.erase(0, pos + delimiter.length());
+    }
+}
 
 // ------------------------
 // Radar screen creation
@@ -219,7 +218,6 @@ void MUAC::OnTimer(int Counter)
 {
     if (Counter % 5 == 0)
     {
-        // Periodically poll Hoppie server
         thread pollThread(pollHoppieMessages);
         pollThread.detach();
     }
@@ -266,7 +264,8 @@ void sendHoppieMessage()
 {
     if (!httpHelper) return;
 
-    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=" + tdest + "&type=" + ttype + "&packet=" + tmessage;
+    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign +
+                 "&to=" + tdest + "&type=" + ttype + "&packet=" + tmessage;
 
     size_t pos = 0;
     while ((pos = url.find(" ", pos)) != string::npos)
@@ -283,17 +282,3 @@ void sendHoppieMessage()
     }
 }
 
-// ------------------------
-// Poll messages from Hoppie
-// ------------------------
-void pollHoppieMessages()
-{
-    if (!httpHelper) return;
-
-    string url = baseUrlDatalink + "?logon=" + logonCode + "&from=" + logonCallsign + "&to=SERVER&type=POLL";
-    string raw = httpHelper->downloadStringFromURL(url);
-
-    if (raw.find("ok") != 0 || raw.size() <= 3) return;
-
-    // TODO: parse messages from raw string
-}
