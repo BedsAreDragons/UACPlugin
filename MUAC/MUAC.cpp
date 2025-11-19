@@ -95,7 +95,7 @@ bool MUAC::OnCompileCommand(const char * sCommandLine) {
 	else if (startsWith(".uac poll", sCommandLine))
 	{
 		if (HoppieConnected) {
-			_beginthread(pollMessages, 0, NULL);
+			_beginthread(pollHoppieMessages, 0, NULL);
 		}
 		return true;
 	}
@@ -163,7 +163,7 @@ void MUAC::RegisterPlugin()
 // ------------------------
 // Hoppie datalink login
 // ------------------------
-void datalinkLogin()
+void datalinkLogin(void * arg)
 {
     if (!httpHelper) return;
 
@@ -189,7 +189,7 @@ void datalinkLogin()
 // ------------------------
 // Send Hoppie message
 // ------------------------
-void sendHoppieMessage()
+void sendHoppieMessage(void * arg)
 {
     if (!httpHelper) return;
 
@@ -213,7 +213,7 @@ void sendHoppieMessage()
 // ------------------------
 // Poll messages from Hoppie
 // ------------------------
-void pollHoppieMessages()
+void pollHoppieMessages(void * arg)
 {
     if (!httpHelper) return;
 
